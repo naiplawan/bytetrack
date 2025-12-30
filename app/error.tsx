@@ -1,11 +1,14 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, RefreshCw, Home, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { t } from '@/lib/translations';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -27,6 +30,13 @@ interface ErrorPageProps {
 }
 
 export default function ErrorPage({ error, reset }: ErrorPageProps) {
+  const router = useRouter();
+  const { language } = useLanguage();
+
+  const handleGoBack = () => {
+    router.back();
+  };
+
   return (
     <div className="min-h-screen bg-background spotify-scrollbar flex items-center justify-center">
       <div className="spotify-container max-w-2xl">
@@ -34,15 +44,15 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
           {/* Error Icon */}
           <motion.div variants={fadeIn} className="spotify-flex-center">
             <div className="w-32 h-32 rounded-full bg-destructive/10 spotify-flex-center">
-              <AlertTriangle className="w-16 h-16 text-destructive" />
+              <AlertTriangle className="w-16 h-16 text-destructive" aria-hidden="true" />
             </div>
           </motion.div>
 
           {/* Error Message */}
           <motion.div variants={fadeIn} className="space-y-4">
-            <h1 className="spotify-text-hero text-4xl lg:text-5xl">Oops! Something went wrong</h1>
+            <h1 className="spotify-text-hero text-4xl lg:text-5xl">{t('error_title_i18n', language)}</h1>
             <p className="spotify-text-body text-xl max-w-md mx-auto">
-              We encountered an unexpected error. Don't worry, we're on it!
+              {t('error_description_i18n', language)}
             </p>
           </motion.div>
 
@@ -51,13 +61,13 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
             <Card className="spotify-card text-left">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-destructive">
-                  <AlertTriangle className="w-5 h-5" />
-                  Error Details
+                  <AlertTriangle className="w-5 h-5" aria-hidden="true" />
+                  {t('error_details_i18n', language)}
                 </CardTitle>
-                <CardDescription>Technical information about what went wrong</CardDescription>
+                <CardDescription>{t('error_technicalInfo_i18n', language)}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="p-4 bg-destructive/5 rounded-lg border border-destructive/20">
+                <div className="p-4 bg-destructive/5 rounded-xl border border-destructive/20">
                   <p className="text-sm font-mono text-destructive break-all">
                     {error.message || 'An unexpected error occurred'}
                   </p>
@@ -70,24 +80,22 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
           {/* Action Buttons */}
           <motion.div variants={fadeIn} className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button onClick={reset} className="spotify-button flex items-center gap-2" size="lg">
-                <RefreshCw className="w-5 h-5" />
-                Try Again
+              <Button onClick={reset} variant="primary" size="lg" className="flex items-center gap-2">
+                <RefreshCw className="w-5 h-5" aria-hidden="true" />
+                {t('error_tryAgain_i18n', language)}
               </Button>
 
               <Button variant="outline" asChild size="lg" className="flex items-center gap-2">
                 <Link href="/dashboard">
-                  <Home className="w-5 h-5" />
-                  Go to Dashboard
+                  <Home className="w-5 h-5" aria-hidden="true" />
+                  {t('error_goToDashboard_i18n', language)}
                 </Link>
               </Button>
             </div>
 
-            <Button variant="ghost" asChild className="flex items-center gap-2">
-              <Link href="javascript:history.back()">
-                <ArrowLeft className="w-4 h-4" />
-                Go Back
-              </Link>
+            <Button variant="ghost" onClick={handleGoBack} className="flex items-center gap-2">
+              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+              {t('error_goBack_i18n', language)}
             </Button>
           </motion.div>
 
@@ -96,13 +104,13 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
             <Card className="spotify-card-compact">
               <CardContent className="p-6">
                 <div className="text-center space-y-3">
-                  <h3 className="font-semibold text-foreground">Need Help?</h3>
+                  <h3 className="font-semibold text-foreground">{t('error_needHelp_i18n', language)}</h3>
                   <p className="text-sm spotify-text-body">
-                    If this error persists, please contact our support team with the error ID above.
+                    {t('error_contactSupport_i18n', language)}
                   </p>
                   <div className="flex flex-wrap gap-2 justify-center text-sm">
                     <span className="spotify-text-small">
-                      Common causes: Network issues, server maintenance, or temporary glitches
+                      {t('error_commonCauses_i18n', language)}
                     </span>
                   </div>
                 </div>

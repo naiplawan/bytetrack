@@ -1,4 +1,19 @@
-// Thai Food API integration
+// Thai Food API - Backward compatible wrapper for the new food-api service
+// This file maintains backward compatibility with existing components
+
+import {
+  searchFoods as searchFoodsNew,
+  searchLocalFoods,
+  getLocalFoodById,
+  getCategories as getCategoriesNew,
+  getProductByBarcode,
+  toLegacyFoodItem,
+  type FoodItem as NewFoodItem,
+  type FoodCategory as NewFoodCategory,
+  type SearchResult,
+} from './food-api';
+
+// Legacy types for backward compatibility
 export interface FoodItem {
   id: string;
   name: string;
@@ -21,185 +36,80 @@ export interface FoodCategory {
   icon: string;
 }
 
-// Mock data for development
-const mockCategories: FoodCategory[] = [
-  { id: 'rice', name: 'ข้าว', nameEn: 'Rice & Grains', icon: '🍚' },
-  { id: 'noodles', name: 'เส้น', nameEn: 'Noodles', icon: '🍜' },
-  { id: 'curry', name: 'แกง', nameEn: 'Curry', icon: '🍛' },
-  { id: 'stir-fry', name: 'ผัด', nameEn: 'Stir-fry', icon: '🥘' },
-  { id: 'soup', name: 'ต้ม', nameEn: 'Soup', icon: '🍲' },
-  { id: 'salad', name: 'ยำ', nameEn: 'Salad', icon: '🥗' },
-  { id: 'grilled', name: 'ย่าง', nameEn: 'Grilled', icon: '🍖' },
-  { id: 'dessert', name: 'ของหวาน', nameEn: 'Dessert', icon: '🍮' },
-];
+// Convert new FoodItem to legacy format
+function convertToLegacy(food: NewFoodItem): FoodItem {
+  return toLegacyFoodItem(food);
+}
 
-const mockFoods: FoodItem[] = [
-  {
-    id: '1',
-    name: 'ข้าวผัดกุ้ง',
-    nameEn: 'Fried Rice with Shrimp',
-    category: 'rice',
-    calories: 350,
-    protein: 18,
-    carbs: 45,
-    fat: 12,
-    fiber: 2,
-    servingSize: 250,
-    emoji: '🍤',
-  },
-  {
-    id: '2',
-    name: 'ผัดไทย',
-    nameEn: 'Pad Thai',
-    category: 'noodles',
-    calories: 400,
-    protein: 15,
-    carbs: 55,
-    fat: 14,
-    fiber: 3,
-    servingSize: 300,
-    emoji: '🍜',
-  },
-  {
-    id: '3',
-    name: 'แกงเขียวหวานไก่',
-    nameEn: 'Green Curry with Chicken',
-    category: 'curry',
-    calories: 280,
-    protein: 25,
-    carbs: 8,
-    fat: 18,
-    fiber: 2,
-    servingSize: 200,
-    emoji: '🍛',
-  },
-  {
-    id: '4',
-    name: 'ต้มยำกุ้ง',
-    nameEn: 'Tom Yum Goong',
-    category: 'soup',
-    calories: 120,
-    protein: 15,
-    carbs: 8,
-    fat: 3,
-    fiber: 1,
-    servingSize: 250,
-    emoji: '🍲',
-  },
-  {
-    id: '5',
-    name: 'ข้าวขาวหมูแดง',
-    nameEn: 'Rice with Red Pork',
-    category: 'rice',
-    calories: 450,
-    protein: 22,
-    carbs: 60,
-    fat: 15,
-    fiber: 1,
-    servingSize: 300,
-    emoji: '🍚',
-  },
-  {
-    id: '6',
-    name: 'ส้มตำ',
-    nameEn: 'Papaya Salad',
-    category: 'salad',
-    calories: 150,
-    protein: 3,
-    carbs: 30,
-    fat: 2,
-    fiber: 8,
-    servingSize: 200,
-    emoji: '🥗',
-  },
-  {
-    id: '7',
-    name: 'ไก่ย่าง',
-    nameEn: 'Grilled Chicken',
-    category: 'grilled',
-    calories: 250,
-    protein: 35,
-    carbs: 0,
-    fat: 12,
-    fiber: 0,
-    servingSize: 150,
-    emoji: '🍖',
-  },
-  {
-    id: '8',
-    name: 'ผัดกะเพราหมูสับ',
-    nameEn: 'Stir-fried Basil with Minced Pork',
-    category: 'stir-fry',
-    calories: 320,
-    protein: 20,
-    carbs: 15,
-    fat: 22,
-    fiber: 2,
-    servingSize: 200,
-    emoji: '🥘',
-  },
-  {
-    id: '9',
-    name: 'มะม่วงข้าวเหนียว',
-    nameEn: 'Mango Sticky Rice',
-    category: 'dessert',
-    calories: 380,
-    protein: 6,
-    carbs: 70,
-    fat: 12,
-    fiber: 3,
-    servingSize: 180,
-    emoji: '🍮',
-  },
-  {
-    id: '10',
-    name: 'ข้าวต้มไก่',
-    nameEn: 'Rice Porridge with Chicken',
-    category: 'soup',
-    calories: 200,
-    protein: 15,
-    carbs: 25,
-    fat: 5,
-    fiber: 1,
-    servingSize: 300,
-    emoji: '🍲',
-  },
-];
-
+// Search foods - combines local Thai foods with Open Food Facts API
 export async function searchFoods(query: string, category?: string): Promise<FoodItem[]> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 300));
+  const result = await searchFoodsNew(query, {
+    category,
+    includeApi: true,
+    pageSize: 20,
+  });
 
-  let results = mockFoods;
-
-  if (category) {
-    results = results.filter((food) => food.category === category);
-  }
-
-  if (query) {
-    const lowercaseQuery = query.toLowerCase();
-    results = results.filter(
-      (food) => food.name.toLowerCase().includes(lowercaseQuery) || food.nameEn.toLowerCase().includes(lowercaseQuery)
-    );
-  }
-
-  return results;
+  return result.foods.map(convertToLegacy);
 }
 
+// Get categories
 export async function getCategories(): Promise<FoodCategory[]> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 200));
-  return mockCategories;
+  return getCategoriesNew();
 }
 
+// Get food by ID
 export async function getFoodById(id: string): Promise<FoodItem | null> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 100));
-  return mockFoods.find((food) => food.id === id) || null;
+  const food = getLocalFoodById(id);
+  return food ? convertToLegacy(food) : null;
 }
 
+// Get all Thai foods (local only)
 export async function getThaiFood(): Promise<FoodItem[]> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 200));
-  return mockFoods;
+  const localFoods = searchLocalFoods('');
+  return localFoods.map(convertToLegacy);
 }
+
+// Search local Thai foods only (no API call)
+export async function searchLocalThaiFoods(query: string, category?: string): Promise<FoodItem[]> {
+  const localFoods = searchLocalFoods(query, category);
+  return localFoods.map(convertToLegacy);
+}
+
+// Scan barcode using Open Food Facts
+export async function scanBarcode(barcode: string): Promise<FoodItem | null> {
+  const food = await getProductByBarcode(barcode);
+  return food ? convertToLegacy(food) : null;
+}
+
+// Advanced search with pagination
+export async function searchFoodsAdvanced(
+  query: string,
+  options: {
+    category?: string;
+    includeApi?: boolean;
+    page?: number;
+    pageSize?: number;
+  } = {}
+): Promise<{
+  foods: FoodItem[];
+  total: number;
+  page: number;
+  hasMore: boolean;
+}> {
+  const result = await searchFoodsNew(query, options);
+
+  return {
+    foods: result.foods.map(convertToLegacy),
+    total: result.total,
+    page: result.page,
+    hasMore: result.hasMore,
+  };
+}
+
+// Re-export new types and functions for components that want to use the new API
+export {
+  searchFoodsNew as searchFoodsWithNutrition,
+  getProductByBarcode,
+  type NewFoodItem as FoodItemDetailed,
+  type SearchResult,
+};

@@ -5,6 +5,8 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { ConditionalLayout } from '@/components/conditional-layout';
 import LanguageToggle from '@/components/language-toggle';
+import { LangProvider } from '@/components/lang-provider';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -37,11 +39,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${notoSansThai.variable} font-sans antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <ConditionalLayout>{children}</ConditionalLayout>
-          <LanguageToggle />
-          <Toaster />
-        </ThemeProvider>
+        <LangProvider>
+          <LanguageProvider>
+            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+              <ConditionalLayout>{children}</ConditionalLayout>
+              <LanguageToggle />
+              <Toaster />
+            </ThemeProvider>
+          </LanguageProvider>
+        </LangProvider>
       </body>
     </html>
   );

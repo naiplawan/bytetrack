@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -9,47 +11,158 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   icon?: React.ReactNode;
   description?: string;
   required?: boolean;
+  isValid?: boolean;
+  isValidating?: boolean;
+  showSuccessState?: boolean;
 }
 
 export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
-  ({ label, error, icon, description, required, className, ...props }, ref) => {
+  (
+    {
+      label,
+      error,
+      icon,
+      description,
+      required,
+      isValid,
+      isValidating,
+      showSuccessState = true,
+      className,
+      id,
+      ...props
+    },
+    ref
+  ) => {
+    const [isFocused, setIsFocused] = useState(false);
+    const [hasInteracted, setHasInteracted] = useState(false);
+
+    const inputId = id || `input-${label.toLowerCase().replace(/\s+/g, '-')}`;
+    const errorId = `${inputId}-error`;
+    const descriptionId = `${inputId}-description`;
+
+    const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+      setIsFocused(true);
+      props.onFocus?.(e);
+    }, [props.onFocus]);
+
+    const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+      setIsFocused(false);
+      setHasInteracted(true);
+      props.onBlur?.(e);
+    }, [props.onBlur]);
+
+    const showError = error && hasInteracted;
+    const showSuccess = showSuccessState && isValid && hasInteracted && !error && !isValidating;
+
     return (
       <div className="space-y-2">
-        <Label className="form-label">
+        <Label htmlFor={inputId} className="form-label flex items-center gap-1">
           {label}
-          {required && <span className="text-destructive ml-1">*</span>}
+          {required && (
+            <span className="text-destructive" aria-hidden="true">*</span>
+          )}
+          {required && <span className="sr-only">(required)</span>}
         </Label>
 
         <div className="relative">
+          {/* Left icon */}
           {icon && (
-            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">{icon}</div>
+            <div
+              className={cn(
+                "absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-200",
+                isFocused ? 'text-primary' : 'text-muted-foreground',
+                showError && 'text-destructive'
+              )}
+              aria-hidden="true"
+            >
+              {icon}
+            </div>
           )}
+
           <Input
             ref={ref}
+            id={inputId}
             className={cn(
-              'form-input',
+              'form-input transition-all duration-200',
               icon && 'pl-10',
-              error && 'border-destructive focus:border-destructive focus:ring-destructive/20',
+              (isValidating || showSuccess) && 'pr-10',
+              showError && 'border-destructive focus:border-destructive focus:ring-destructive/20',
+              showSuccess && 'border-primary/50 focus:border-primary focus:ring-primary/20',
               className
             )}
+            aria-invalid={showError ? 'true' : undefined}
+            aria-describedby={cn(
+              showError && errorId,
+              description && descriptionId
+            ) || undefined}
+            aria-required={required}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             {...props}
           />
+
+          {/* Right status indicator */}
+          <AnimatePresence mode="wait">
+            {isValidating && (
+              <motion.div
+                key="validating"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                aria-hidden="true"
+              >
+                <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
+              </motion.div>
+            )}
+            {showSuccess && !isValidating && (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                aria-hidden="true"
+              >
+                <CheckCircle2 className="w-4 h-4 text-primary" />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        {description && !error && <p className="text-body-small">{description}</p>}
+        {/* Description text */}
+        <AnimatePresence mode="wait">
+          {description && !showError && (
+            <motion.p
+              key="description"
+              id={descriptionId}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="text-body-small text-muted-foreground"
+            >
+              {description}
+            </motion.p>
+          )}
 
-        {error && (
-          <p className="form-error flex items-center gap-1">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                clipRule="evenodd"
-              />
-            </svg>
-            {error}
-          </p>
-        )}
+          {/* Error message with animation */}
+          {showError && (
+            <motion.div
+              key="error"
+              id={errorId}
+              initial={{ opacity: 0, y: -10, height: 0 }}
+              animate={{ opacity: 1, y: 0, height: 'auto' }}
+              exit={{ opacity: 0, y: -10, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="form-error flex items-center gap-1.5"
+              role="alert"
+              aria-live="polite"
+            >
+              <AlertCircle className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+              <span>{error}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     );
   }

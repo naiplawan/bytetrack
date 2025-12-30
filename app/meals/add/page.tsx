@@ -9,8 +9,11 @@ import { Card } from '@/components/ui/modern-card';
 import { Input } from '@/components/ui/modern-input';
 import { Badge } from '@/components/ui/badge';
 import { fadeIn, slideUp, staggerContainer } from '@/lib/motion-variants';
+import { t } from '@/lib/translations';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function AddFoodPage() {
+  const { language } = useLanguage();
   const [quantity, setQuantity] = useState(1);
   const [customFood, setCustomFood] = useState({
     name: '',
@@ -52,7 +55,7 @@ export default function AddFoodPage() {
               <ArrowLeft size={20} />
             </Button>
           </Link>
-          <h1 className="spotify-text-heading">Add Food</h1>
+          <h1 className="spotify-text-heading">{t('meals_addFood_i18n', language)}</h1>
           <div className="flex gap-2">
             <Button variant="ghost" size="icon" className="apple-card-interactive">
               <Camera size={20} />
@@ -72,7 +75,7 @@ export default function AddFoodPage() {
               className="flex-1"
               onClick={() => setIsCustom(false)}
             >
-              Search Foods
+              {t('meals_searchFoods_i18n', language)}
             </Button>
             <Button
               variant={isCustom ? 'primary' : 'ghost'}
@@ -80,7 +83,7 @@ export default function AddFoodPage() {
               className="flex-1"
               onClick={() => setIsCustom(true)}
             >
-              Custom Entry
+              {t('meals_customEntry_i18n', language)}
             </Button>
           </div>
         </motion.div>
@@ -100,26 +103,26 @@ export default function AddFoodPage() {
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="text-center p-3 bg-background/30 rounded-lg">
-                    <p className="text-sm text-muted-foreground">Calories</p>
+                    <p className="text-sm text-muted-foreground">{t('meals_calories_i18n', language)}</p>
                     <p className="text-lg font-semibold text-primary">{Math.round(selectedFood.calories * quantity)}</p>
                   </div>
                   <div className="text-center p-3 bg-background/30 rounded-lg">
-                    <p className="text-sm text-muted-foreground">Serving</p>
+                    <p className="text-sm text-muted-foreground">{t('meals_serving_i18n', language)}</p>
                     <p className="text-lg font-semibold">{Math.round(selectedFood.servingSize * quantity)}g</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-3 mb-6">
                   <div className="text-center p-3 bg-orange-500/10 rounded-lg border border-orange-500/20">
-                    <p className="text-xs text-orange-600 font-medium">Carbs</p>
+                    <p className="text-xs text-orange-600 font-medium">{t('dashboard_carbs_i18n', language)}</p>
                     <p className="text-sm font-semibold">{Math.round(selectedFood.carbs * quantity)}g</p>
                   </div>
                   <div className="text-center p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
-                    <p className="text-xs text-blue-600 font-medium">Protein</p>
+                    <p className="text-xs text-blue-600 font-medium">{t('dashboard_protein_i18n', language)}</p>
                     <p className="text-sm font-semibold">{Math.round(selectedFood.protein * quantity)}g</p>
                   </div>
                   <div className="text-center p-3 bg-green-500/10 rounded-lg border border-green-500/20">
-                    <p className="text-xs text-green-600 font-medium">Fat</p>
+                    <p className="text-xs text-green-600 font-medium">{t('dashboard_fat_i18n', language)}</p>
                     <p className="text-sm font-semibold">{Math.round(selectedFood.fat * quantity)}g</p>
                   </div>
                 </div>
@@ -131,7 +134,7 @@ export default function AddFoodPage() {
                   </Button>
                   <div className="text-center min-w-[80px]">
                     <p className="text-2xl font-bold">{quantity}</p>
-                    <p className="text-xs text-muted-foreground">servings</p>
+                    <p className="text-xs text-muted-foreground">{t('meals_servings_i18n', language)}</p>
                   </div>
                   <Button variant="outline" size="icon" onClick={() => adjustQuantity(0.5)} className="rounded-full">
                     <Plus size={16} />
@@ -145,12 +148,12 @@ export default function AddFoodPage() {
           <motion.div variants={staggerContainer} className="space-y-6">
             <motion.div variants={slideUp}>
               <Card variant="glass" className="p-6">
-                <h2 className="spotify-text-heading mb-6 text-center">Custom Food Entry</h2>
+                <h2 className="spotify-text-heading mb-6 text-center">{t('meals_customFoodEntry_i18n', language)}</h2>
 
                 <div className="space-y-4">
                   <Input
-                    label="Food Name"
-                    placeholder="Enter food name"
+                    label={t('meals_foodName_i18n', language)}
+                    placeholder={t('meals_enterFoodName_i18n', language)}
                     value={customFood.name}
                     onChange={(e) => setCustomFood((prev) => ({ ...prev, name: e.target.value }))}
                     variant="glass"
@@ -158,7 +161,7 @@ export default function AddFoodPage() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <Input
-                      label="Calories"
+                      label={t('meals_calories_i18n', language)}
                       type="number"
                       placeholder="0"
                       value={customFood.calories}
@@ -166,7 +169,7 @@ export default function AddFoodPage() {
                       variant="glass"
                     />
                     <Input
-                      label="Serving Size (g)"
+                      label={`${t('meals_servingSize_i18n', language)} (g)`}
                       type="number"
                       placeholder="100"
                       value={customFood.servingSize}
@@ -177,7 +180,7 @@ export default function AddFoodPage() {
 
                   <div className="grid grid-cols-3 gap-3">
                     <Input
-                      label="Carbs (g)"
+                      label={`${t('dashboard_carbs_i18n', language)} (g)`}
                       type="number"
                       placeholder="0"
                       value={customFood.carbs}
@@ -185,7 +188,7 @@ export default function AddFoodPage() {
                       variant="glass"
                     />
                     <Input
-                      label="Protein (g)"
+                      label={`${t('dashboard_protein_i18n', language)} (g)`}
                       type="number"
                       placeholder="0"
                       value={customFood.protein}
@@ -193,7 +196,7 @@ export default function AddFoodPage() {
                       variant="glass"
                     />
                     <Input
-                      label="Fat (g)"
+                      label={`${t('dashboard_fat_i18n', language)} (g)`}
                       type="number"
                       placeholder="0"
                       value={customFood.fat}
@@ -209,11 +212,17 @@ export default function AddFoodPage() {
 
         {/* Quick Add Suggestions */}
         <motion.div variants={slideUp} className="mt-8">
-          <h3 className="spotify-text-subheading mb-4">Recent & Quick Add</h3>
+          <h3 className="spotify-text-subheading mb-4">{t('meals_recentQuickAdd_i18n', language)}</h3>
           <div className="flex flex-wrap gap-2">
-            {['Rice', 'Chicken', 'Vegetables', 'Egg', 'Milk'].map((item) => (
-              <Badge key={item} variant="outline" className="px-3 py-1 cursor-pointer hover:bg-primary/10">
-                {item}
+            {[
+              { key: 'rice', en: 'Rice', th: 'ข้าว' },
+              { key: 'chicken', en: 'Chicken', th: 'ไก่' },
+              { key: 'vegetables', en: 'Vegetables', th: 'ผัก' },
+              { key: 'egg', en: 'Egg', th: 'ไข่' },
+              { key: 'milk', en: 'Milk', th: 'นม' },
+            ].map((item) => (
+              <Badge key={item.key} variant="outline" className="px-3 py-1 cursor-pointer hover:bg-primary/10">
+                {language === 'th' ? item.th : item.en}
               </Badge>
             ))}
           </div>
@@ -228,12 +237,12 @@ export default function AddFoodPage() {
         >
           <div className="flex gap-3">
             <Button variant="outline" size="lg" className="flex-1">
-              Save as Favorite
+              {t('meals_saveAsFavorite_i18n', language)}
             </Button>
             <Link href="/meals" className="flex-1">
               <Button size="lg" className="w-full bg-primary hover:bg-primary/80">
                 <Check className="w-4 h-4 mr-2" />
-                Add to Diary
+                {t('meals_addToDiary_i18n', language)}
               </Button>
             </Link>
           </div>

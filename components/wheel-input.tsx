@@ -64,9 +64,10 @@ export function WheelHeightInput({ value, onChange, placeholder }: WheelHeightIn
                     options={heightOptions}
                     value={field.value}
                     onValueChange={(value) => {
-                      field.onChange(value);
+                      const stringValue = String(value);
+                      field.onChange(stringValue);
                       if (onChange) {
-                        onChange(value);
+                        onChange(stringValue);
                       }
                     }}
                   />

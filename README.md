@@ -1,299 +1,198 @@
-# 🍽️ ByteTrack
+# ByteTrack
 
-A sophisticated, production-ready calorie tracking and wellness application built with cutting-edge web technologies. Features a beautiful design system inspired by Apple and Spotify, comprehensive food tracking capabilities, and an exceptional user experience.
+A modern calorie tracking and wellness application built with Next.js 15. Features bilingual support (English/Thai), integration with Open Food Facts API for 3M+ foods, and a beautiful UI inspired by Apple and Spotify design systems.
 
-## ✨ Key Features
+## Features
 
-### 🎨 **Modern Design System**
-- **Apple & Spotify Inspired UI**: Clean, professional interface with glass morphism effects
-- **40+ Reusable Components**: Comprehensive component library with multiple variants
-- **Advanced Typography**: Modern font stacks with responsive text scaling
-- **Motion Design**: Smooth animations and micro-interactions using Framer Motion
-- **Dark/Light Mode**: Seamless theme switching with system preference detection
+### Food Tracking
+- **Open Food Facts API Integration**: Access to 3M+ foods worldwide
+- **Local Thai Food Database**: 20+ authentic Thai dishes with accurate nutrition data
+- **Combined Search**: Searches local database first, then API for comprehensive results
+- **Barcode Scanning Ready**: API support for barcode lookup
+- **Complete Nutrition Data**: Calories, protein, carbs, fat, fiber, sugar, sodium
 
-### 🏃‍♂️ **Enhanced Onboarding Experience**
-- **4-Step Guided Setup**: Intuitive onboarding with visual progress indicators
-- **Smart Form Validation**: Real-time validation with helpful error messages
-- **Scientific Calculations**: BMR, TDEE, and macro targets using proven formulas
-- **Goal-Specific Guidance**: Personalized recommendations based on user objectives
-- **Responsive Mobile Design**: Perfect mobile experience with touch-friendly interactions
+### User Experience
+- **Bilingual Support**: Full English and Thai language switching
+- **4-Step Onboarding**: Guided setup with BMR/TDEE calculations
+- **Smart Calorie Goals**: Personalized targets based on user goals (lose/maintain/gain)
+- **Dark/Light Mode**: System preference detection with manual toggle
+- **Smooth Animations**: Framer Motion powered interactions
 
-### 📱 **Complete Food Diary**
-- **Thai Food Database**: 10+ pre-loaded Thai dishes with complete nutritional information
-- **Real-time Search**: Instant food search with category filtering
-- **Meal Tracking**: Breakfast, lunch, dinner, and snack categorization
-- **Custom Food Entry**: Add custom foods with complete nutritional data
-- **Portion Control**: Easy quantity adjustment with visual feedback
-- **Daily Progress**: Visual calorie and macro tracking with progress bars
+### Design System
+- **40+ UI Components**: Cards, buttons, inputs with multiple variants
+- **Glass Morphism Effects**: Modern translucent design elements
+- **Responsive Design**: Mobile-first approach, works on all devices
+- **Accessibility**: WCAG 2.1 AA compliant
 
-### 🎯 **Smart Nutrition Tracking**
-- **Personalized Targets**: Based on user's BMR, TDEE, and health goals
-- **Macro Breakdown**: Carbs, protein, and fat tracking with color-coded progress
-- **Visual Progress**: Beautiful progress rings and animated charts
-- **Goal-Based Recommendations**: Tailored advice for weight loss, maintenance, or gain
+## Tech Stack
 
-## 🛠️ Tech Stack
+| Category | Technology |
+|----------|------------|
+| Framework | Next.js 15.2.4 (App Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS |
+| Animations | Framer Motion |
+| Forms | React Hook Form + Zod |
+| Icons | Lucide React |
+| Food API | Open Food Facts (free, no API key) |
 
-### **Core Technologies**
-- **Framework**: Next.js 15.2.4 (App Router)
-- **Language**: TypeScript (100% type coverage)
-- **Styling**: Tailwind CSS with custom design system
-- **Animations**: Framer Motion for smooth interactions
-
-### **UI & Components**
-- **Component Library**: Custom components inspired by shadcn/ui
-- **Icons**: Lucide React for consistent iconography
-- **Forms**: React Hook Form with Zod validation
-- **State Management**: React hooks and context
-
-### **Development Tools**
-- **Package Manager**: npm/pnpm
-- **Linting**: ESLint with TypeScript rules
-- **Build Tool**: Next.js with optimized bundling
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 18+
-- npm, pnpm, or yarn
-
-### Installation
+## Quick Start
 
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd byte-track
-
 # Install dependencies
 npm install
-# or
-pnpm install
 
 # Start development server
 npm run dev
-# or
-pnpm dev
 
-# Open your browser
-# Navigate to http://localhost:3000
+# Build for production
+npm run build
+
+# Start production server
+npm start
 ```
 
-### Available Scripts
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Project Structure
+
+```
+bytetrack/
+├── app/
+│   ├── page.tsx              # Landing page
+│   ├── dashboard/            # Main dashboard
+│   ├── meals/                # Food diary
+│   │   ├── page.tsx          # Meals list with search
+│   │   ├── add/              # Add food entry
+│   │   └── plan/             # Meal planning (coming soon)
+│   ├── onboarding/           # User setup flow
+│   ├── analytics/            # Analytics (coming soon)
+│   └── goals/                # Goals management (coming soon)
+├── components/
+│   ├── ui/                   # Reusable UI components
+│   ├── dashboard/            # Dashboard-specific components
+│   └── onboarding/           # Onboarding step components
+├── lib/
+│   ├── food-api.ts           # Open Food Facts + local database
+│   ├── thai-food-api.ts      # Backward-compatible food API
+│   ├── calorie-calculator.ts # BMR/TDEE calculations
+│   ├── translations.ts       # i18n translations (EN/TH)
+│   └── validations/          # Zod schemas
+└── contexts/
+    └── LanguageContext.tsx   # Language state management
+```
+
+## Food API
+
+### Search Foods
+```typescript
+import { searchFoods } from '@/lib/thai-food-api';
+
+// Combines local Thai foods + Open Food Facts API
+const results = await searchFoods('chicken');
+```
+
+### Local Thai Foods Only
+```typescript
+import { searchLocalThaiFoods } from '@/lib/thai-food-api';
+
+const thaiFoods = await searchLocalThaiFoods('ไก่');
+```
+
+### Barcode Lookup
+```typescript
+import { scanBarcode } from '@/lib/thai-food-api';
+
+const food = await scanBarcode('8850999220017');
+```
+
+### Available Functions
+
+| Function | Description |
+|----------|-------------|
+| `searchFoods(query)` | Combined search (Thai + API) |
+| `searchLocalThaiFoods(query)` | Thai foods only |
+| `getThaiFood()` | Get all local Thai foods |
+| `scanBarcode(barcode)` | Lookup by barcode |
+| `getCategories()` | Get food categories |
+
+## Translations
+
+The app supports English and Thai. Translations are managed in `lib/translations.ts`.
+
+```typescript
+import { t } from '@/lib/translations';
+import { useLanguage } from '@/contexts/LanguageContext';
+
+function MyComponent() {
+  const { language } = useLanguage();
+  return <h1>{t('dashboard_title_i18n', language)}</h1>;
+}
+```
+
+## Calorie Calculations
+
+Uses scientifically-backed formulas:
+
+- **BMR**: Mifflin-St Jeor equation
+- **TDEE**: BMR × Activity multiplier
+- **Goal Adjustment**: ±300-500 calories based on goal
+
+```typescript
+import { calculateBMR, calculateTDEE } from '@/lib/calorie-calculator';
+
+const bmr = calculateBMR({ age: 25, gender: 'male', height: 175, weight: 70 });
+const tdee = calculateTDEE(bmr, 'moderate');
+```
+
+## Environment Variables
+
+No environment variables required. The Open Food Facts API is free and doesn't need an API key.
+
+Optional configuration can be added in `.env.local`:
+
+```env
+# Optional: Analytics, etc.
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+## Scripts
 
 ```bash
-npm run dev      # Start development server
-npm run build    # Build for production
-npm run start    # Start production server
-npm run lint     # Run ESLint
+npm run dev       # Development server
+npm run build     # Production build
+npm run start     # Production server
+npm run lint      # ESLint check
 ```
 
-## 📱 Application Structure
+## Browser Support
 
-```
-📦 byte-track/
-├── 📁 app/                          # Next.js 15 App Router
-│   ├── 📄 layout.tsx               # Root layout with theme provider
-│   ├── 📄 page.tsx                 # Landing page with feature showcase
-│   ├── 📄 globals.css              # Modern design system CSS
-│   ├── 📁 dashboard/               # Main dashboard overview
-│   ├── 📁 meals/                   # Food diary and tracking
-│   │   └── 📁 add/                 # Add food entry flow
-│   └── 📁 onboarding/              # 4-step user onboarding
-├── 📁 components/                   # Reusable components
-│   ├── 📁 ui/                      # 40+ UI components
-│   │   ├── 📄 modern-card.tsx      # Advanced card system
-│   │   ├── 📄 modern-input.tsx     # Enhanced form inputs
-│   │   ├── 📄 form-radio-group.tsx # Interactive radio groups
-│   │   ├── 📄 button.tsx           # Multi-variant button system
-│   │   └── 📄 ...                  # All other UI components
-│   └── 📁 onboarding/              # Onboarding-specific components
-├── 📁 lib/                         # Utility libraries
-│   ├── 📄 calorie-calculator.ts    # BMR/TDEE calculations
-│   ├── 📄 thai-food-api.ts         # Food database and API
-│   ├── 📄 motion-variants.ts       # Framer Motion animations
-│   ├── 📄 translations.ts          # Thai language support
-│   └── 📁 validations/             # Zod schema validations
-└── 📁 styles/                      # Global styles
-    └── 📄 globals.css              # Comprehensive design system
-```
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
 
-## 🎨 Design System
+## Contributing
 
-### **Component Variants**
-- **Cards**: Default, Glass, Elevated, Minimal, Interactive
-- **Buttons**: Primary, Secondary, Ghost, Outline, Premium, Glass, Minimal
-- **Inputs**: Default, Minimal, Glass, Filled with floating labels
-- **Form Controls**: Radio groups, selects with premium styling
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-### **Typography Scale**
-```css
-.spotify-text-hero     /* Large hero text */
-.spotify-text-heading  /* Section headings */
-.spotify-text-body     /* Body text */
-.spotify-text-small    /* Small text */
-```
+## License
 
-### **Color System**
-- **Primary**: Main brand colors with variants
-- **Secondary**: Supporting colors
-- **Accent**: Highlight colors
-- **Semantic**: Success, warning, error, info states
+MIT License - see [LICENSE](LICENSE) for details.
 
-### **Animation System**
-- **Page Transitions**: Smooth enter/exit animations
-- **Micro-interactions**: Button hovers, form focus states
-- **Loading States**: Skeleton loaders and progress indicators
-- **Stagger Animations**: Sequential element animations
+## Acknowledgments
 
-## 📊 Features Deep Dive
-
-### **Onboarding Flow**
-1. **Basic Information** (`/onboarding`)
-   - Age and gender collection with validation
-   - Interactive form elements with real-time feedback
-
-2. **Body Measurements**
-   - Height, current weight, and goal weight input
-   - BMR calculation explanations and guidance
-
-3. **Activity Level Selection**
-   - 5 activity levels from sedentary to extremely active
-   - Visual cards with descriptions and multipliers
-
-4. **Health Goals**
-   - Weight loss, maintenance, or gain options
-   - Goal-specific strategies and recommendations
-
-### **Dashboard** (`/dashboard`)
-- **Daily Overview**: Calorie progress with animated rings
-- **Macro Breakdown**: Carbs, protein, fat with progress bars
-- **Quick Actions**: Fast access to add meals and view progress
-- **Recent Activity**: Overview of recent meals and entries
-
-### **Food Diary** (`/meals`)
-- **Food Search**: Real-time search through Thai food database
-- **Meal Categories**: Visual meal type selection (breakfast, lunch, dinner, snacks)
-- **Nutrition Display**: Complete macro and calorie information
-- **Diary Management**: Add, edit, and remove food entries
-
-### **Add Food Flow** (`/meals/add`)
-- **Food Selection**: Choose from database or create custom entries
-- **Portion Control**: Visual quantity adjustment
-- **Nutrition Preview**: Real-time calorie and macro calculations
-- **Quick Add**: Save favorite foods for easy access
-
-## 🌍 Internationalization
-
-- **Thai Language Support**: Complete Thai translations for UI elements
-- **Thai Food Database**: Authentic Thai dishes with local names
-- **Cultural Considerations**: Appropriate serving sizes and meal patterns
-
-## 📈 Performance & Optimization
-
-### **Build Metrics**
-- **Total Pages**: 8 optimized pages
-- **Bundle Size**: ~188kB for feature-rich pages
-- **Shared JS**: 101kB efficiently shared across routes
-- **First Load JS**: Optimized chunk splitting
-
-### **Performance Features**
-- **Static Generation**: Pre-built pages for fast loading
-- **Image Optimization**: Next.js automatic image optimization
-- **Code Splitting**: Automatic route-based code splitting
-- **Bundle Analysis**: Optimized dependency management
-
-## 🔧 Configuration
-
-### **Tailwind CSS**
-Custom configuration with:
-- Extended color palette for health and wellness theme
-- Custom animations and transitions
-- Responsive breakpoints for all devices
-- Design system utilities
-
-### **TypeScript**
-Strict configuration with:
-- Full type safety across all components
-- Custom type definitions for food data
-- Zod schema validation integration
-
-### **Next.js**
-Optimized setup with:
-- App Router for modern routing
-- TypeScript support
-- Image optimization
-- Performance monitoring
-
-## 🎯 User Experience Highlights
-
-### **Accessibility**
-- **WCAG 2.1 AA Compliant**: Screen reader friendly
-- **Keyboard Navigation**: Full keyboard accessibility
-- **Color Contrast**: High contrast ratios for readability
-- **Focus Management**: Clear focus indicators
-
-### **Mobile Experience**
-- **Touch-Friendly**: Large touch targets and gestures
-- **Responsive Design**: Perfect on all screen sizes
-- **PWA Ready**: Installable as a mobile app
-- **Offline Support**: Core functionality works offline
-
-### **Performance**
-- **Fast Loading**: Optimized bundle sizes
-- **Smooth Animations**: 60fps animations with Framer Motion
-- **Instant Feedback**: Real-time form validation and updates
-- **Efficient Data**: Optimized state management
-
-## 🚀 Deployment
-
-### **Production Build**
-```bash
-npm run build    # Create production build
-npm run start    # Start production server
-```
-
-### **Deployment Platforms**
-- **Vercel**: Optimal deployment platform for Next.js
-- **Netlify**: Static site deployment with serverless functions
-- **Railway**: Full-stack deployment with database support
-
-## 🤝 Contributing
-
-1. **Fork the repository**
-2. **Create a feature branch**
-   ```bash
-   git checkout -b feature/amazing-feature
-   ```
-3. **Commit your changes**
-   ```bash
-   git commit -m 'Add amazing feature'
-   ```
-4. **Push to the branch**
-   ```bash
-   git push origin feature/amazing-feature
-   ```
-5. **Open a Pull Request**
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **[Next.js](https://nextjs.org/)** - The React framework for production
-- **[Tailwind CSS](https://tailwindcss.com/)** - Utility-first CSS framework
-- **[Framer Motion](https://www.framer.com/motion/)** - Motion library for React
-- **[Lucide](https://lucide.dev/)** - Beautiful & consistent icon pack
-- **[Zod](https://zod.dev/)** - TypeScript-first schema validation
-- **[React Hook Form](https://react-hook-form.com/)** - Performant forms library
+- [Next.js](https://nextjs.org/) - React framework
+- [Tailwind CSS](https://tailwindcss.com/) - CSS framework
+- [Framer Motion](https://www.framer.com/motion/) - Animation library
+- [Open Food Facts](https://world.openfoodfacts.org/) - Food database API
+- [Lucide](https://lucide.dev/) - Icon library
+- [shadcn/ui](https://ui.shadcn.com/) - Component inspiration
 
 ---
 
-## 🎉 **Built with ❤️ for modern web development**
-
-**A production-ready food diary application showcasing the best of modern web technologies, exceptional UX design, and comprehensive health tracking capabilities.**
-
-[![Built with Next.js](https://img.shields.io/badge/Built%20with-Next.js-black)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-100%25-blue)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Styled%20with-Tailwind%20CSS-38B2AC)](https://tailwindcss.com/)
-[![Framer Motion](https://img.shields.io/badge/Animated%20with-Framer%20Motion-pink)](https://www.framer.com/motion/)
+Built with Next.js, TypeScript, and Tailwind CSS.

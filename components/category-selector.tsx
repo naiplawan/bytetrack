@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
-import { getFoodCategories } from "@/lib/thai-food-api"
+import { getCategories, type FoodCategory } from "@/lib/thai-food-api"
 import { buttonTap } from "@/lib/motion-variants"
 
 interface CategorySelectorProps {
@@ -13,13 +13,13 @@ interface CategorySelectorProps {
 }
 
 export default function CategorySelector({ selectedCategory, onSelectCategory }: CategorySelectorProps) {
-  const [categories, setCategories] = useState<Array<{ id: string; name: string; name_th: string; count: number }>>([])
+  const [categories, setCategories] = useState<FoodCategory[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const categoriesData = await getFoodCategories()
+        const categoriesData = await getCategories()
         setCategories(categoriesData)
       } catch (error) {
         console.error("Error loading categories:", error)
@@ -55,7 +55,7 @@ export default function CategorySelector({ selectedCategory, onSelectCategory }:
               }`}
               onClick={() => onSelectCategory(category.id)}
             >
-              {category.name_th} {category.count > 0 && <span className="ml-1 text-xs">({category.count})</span>}
+              {category.name}
             </Badge>
           </motion.div>
         ))}

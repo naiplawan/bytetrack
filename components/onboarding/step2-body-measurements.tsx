@@ -4,7 +4,8 @@ import type React from 'react';
 import { motion } from 'framer-motion';
 import type { UseFormReturn } from 'react-hook-form';
 import { Input } from '@/components/ui/modern-input';
-
+import { t } from '@/lib/translations';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { fadeIn } from '@/lib/motion-variants';
 import type { OnboardingFormData } from '@/lib/validations/onboarding';
 import { Scale, Target, Calculator, Info } from 'lucide-react';
@@ -14,6 +15,7 @@ interface Step2Props {
 }
 
 export const Step2BodyMeasurements: React.FC<Step2Props> = ({ form }) => {
+  const { language } = useLanguage();
   const {
     register,
     formState: { errors },
@@ -29,16 +31,12 @@ export const Step2BodyMeasurements: React.FC<Step2Props> = ({ form }) => {
       exit="exit"
     >
       <div className="text-center mb-8">
-        <motion.div
-          className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full mb-6"
-          animate={{ scale: [1, 1.05, 1] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        >
+        <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full mb-6">
           <Calculator className="w-8 h-8 text-primary" />
-        </motion.div>
-        <h3 className="spotify-text-heading mb-3">Body Measurements</h3>
+        </div>
+        <h3 className="spotify-text-heading mb-3">{t('step2_title_i18n', language)}</h3>
         <p className="spotify-text-body text-muted-foreground max-w-lg mx-auto">
-          These measurements help us calculate your personalized daily calorie needs using proven scientific formulas
+          {t('step2_description_i18n', language)}
         </p>
       </div>
 
@@ -61,15 +59,16 @@ export const Step2BodyMeasurements: React.FC<Step2Props> = ({ form }) => {
           }}
         >
           <Input
+            label={t('step2_heightLabel_i18n', language)}
             type="number"
-            placeholder="Enter your height"
+            placeholder={t('step2_heightPlaceholder_i18n', language)}
             min="100"
             max="250"
             step="0.1"
             error={errors.height?.message}
             variant="glass"
             inputSize="lg"
-            helperText="Your height in centimeters (e.g., 170 cm)"
+            helperText={t('step2_heightHelper_i18n', language)}
             {...register('height')}
           />
         </motion.div>
@@ -81,9 +80,9 @@ export const Step2BodyMeasurements: React.FC<Step2Props> = ({ form }) => {
           }}
         >
           <Input
-            label="Current Weight (kg)"
+            label={t('step2_weightLabel_i18n', language)}
             type="number"
-            placeholder="Enter your weight"
+            placeholder={t('step2_weightPlaceholder_i18n', language)}
             min="30"
             max="300"
             step="0.1"
@@ -91,7 +90,7 @@ export const Step2BodyMeasurements: React.FC<Step2Props> = ({ form }) => {
             leftIcon={<Scale className="w-4 h-4" />}
             variant="glass"
             inputSize="lg"
-            helperText="Your current weight in kilograms (e.g., 70 kg)"
+            helperText={t('step2_weightHelper_i18n', language)}
             {...register('weight')}
           />
         </motion.div>
@@ -103,9 +102,9 @@ export const Step2BodyMeasurements: React.FC<Step2Props> = ({ form }) => {
           }}
         >
           <Input
-            label="Goal Weight (kg)"
+            label={t('step2_goalWeightLabel_i18n', language)}
             type="number"
-            placeholder="Enter your goal weight"
+            placeholder={t('step2_goalWeightPlaceholder_i18n', language)}
             min="30"
             max="300"
             step="0.1"
@@ -113,24 +112,23 @@ export const Step2BodyMeasurements: React.FC<Step2Props> = ({ form }) => {
             leftIcon={<Target className="w-4 h-4" />}
             variant="glass"
             inputSize="lg"
-            helperText="Your target weight goal in kilograms"
+            helperText={t('step2_goalWeightHelper_i18n', language)}
             {...register('goalWeight')}
           />
         </motion.div>
       </motion.div>
 
       {/* Information Cards */}
-      <motion.div className="space-y-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+      <div className="space-y-4">
         <div className="p-4 bg-primary/5 rounded-xl border border-primary/20">
           <div className="flex items-start gap-3">
             <div className="w-5 h-5 bg-primary/20 rounded-full flex items-center justify-center mt-0.5">
               <Info className="w-3 h-3 text-primary" />
             </div>
             <div>
-              <p className="text-sm font-medium text-foreground mb-1">Why we need these measurements</p>
+              <p className="text-sm font-medium text-foreground mb-1">{t('step2_infoTitle_i18n', language)}</p>
               <p className="text-xs text-muted-foreground">
-                We use the Mifflin-St Jeor equation to calculate your Basal Metabolic Rate (BMR) - the calories your
-                body needs at rest. Your goal weight helps us tailor recommendations for your specific objectives.
+                {t('step2_infoDescription_i18n', language)}
               </p>
             </div>
           </div>
@@ -142,15 +140,14 @@ export const Step2BodyMeasurements: React.FC<Step2Props> = ({ form }) => {
               <Target className="w-3 h-3 text-accent" />
             </div>
             <div>
-              <p className="text-sm font-medium text-foreground mb-1">Setting realistic goals</p>
+              <p className="text-sm font-medium text-foreground mb-1">{t('step2_tipTitle_i18n', language)}</p>
               <p className="text-xs text-muted-foreground">
-                A healthy rate of weight change is 0.5-1 kg per week. Our recommendations will help you reach your goal
-                weight safely and sustainably.
+                {t('step2_tipDescription_i18n', language)}
               </p>
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </motion.div>
   );
 };

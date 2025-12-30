@@ -1,5 +1,56 @@
+import { z } from 'zod';
+
+// Type definitions
+export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
+
+export interface Meal {
+  id: number;
+  name: string;
+  calories: number;
+  grams: number;
+  mealType: MealType;
+  date: Date;
+  image?: string;
+  carbs: number;
+  protein: number;
+  fat: number;
+}
+
+export interface FoodItem {
+  id: number | string;
+  name: string;
+  calories?: number;
+  carbs?: number;
+  protein?: number;
+  fat?: number;
+  [key: string]: unknown;
+}
+
+// Zod schema for validation
+const mealSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  calories: z.number(),
+  grams: z.number(),
+  mealType: z.enum(['breakfast', 'lunch', 'dinner', 'snack']),
+  date: z.date(),
+  image: z.string().optional(),
+  carbs: z.number(),
+  protein: z.number(),
+  fat: z.number(),
+});
+
+const foodItemSchema = z.object({
+  id: z.union([z.number(), z.string()]),
+  name: z.string(),
+  calories: z.number().optional(),
+  carbs: z.number().optional(),
+  protein: z.number().optional(),
+  fat: z.number().optional(),
+});
+
 // Mock data for meals
-const mockMeals = [
+const mockMeals: Meal[] = [
   {
     id: 1,
     name: "Grilled Chicken Salad",
@@ -48,10 +99,10 @@ const mockMeals = [
     protein: 3,
     fat: 1,
   },
-]
+];
 
 // In a real app, this would be stored in a database
-let meals = [...mockMeals]
+let meals = [...mockMeals];
 
 // Get meals by date
 export function getMealsByDate(date: Date) {
@@ -65,39 +116,43 @@ export function getMealsByType(type: string) {
 }
 
 // Add a new meal
-export function addMeal(meal: any) {
-  const newMeal = {
+export function addMeal(meal: Omit<Meal, 'id' | 'date'>): Meal {
+  const newMeal: Meal = {
     ...meal,
     id: meals.length + 1,
     date: new Date(),
-  }
+  };
 
-  meals.push(newMeal)
+  meals.push(newMeal);
 
   // Store in localStorage for persistence
   try {
-    const storedMeals = JSON.parse(localStorage.getItem("meals") || "[]")
-    localStorage.setItem("meals", JSON.stringify([...storedMeals, newMeal]))
+    const storedData = localStorage.getItem("meals");
+    const storedMeals = storedData ? JSON.parse(storedData) as unknown[] : [];
+    localStorage.setItem("meals", JSON.stringify([...storedMeals, newMeal]));
   } catch (error) {
-    console.error("Error storing meal in localStorage:", error)
+    console.error("Error storing meal in localStorage:", error);
   }
 
-  return newMeal
+  return newMeal;
 }
 
 // Delete a meal
-export function deleteMeal(id: number) {
-  meals = meals.filter((meal) => meal.id !== id)
+export function deleteMeal(id: number): boolean {
+  meals = meals.filter((meal) => meal.id !== id);
 
   // Update localStorage
   try {
-    const storedMeals = JSON.parse(localStorage.getItem("meals") || "[]")
-    localStorage.setItem("meals", JSON.stringify(storedMeals.filter((meal: any) => meal.id !== id)))
+    const storedData = localStorage.getItem("meals");
+    if (storedData) {
+      const storedMeals = JSON.parse(storedData) as Meal[];
+      localStorage.setItem("meals", JSON.stringify(storedMeals.filter((meal) => meal.id !== id)));
+    }
   } catch (error) {
-    console.error("Error updating localStorage:", error)
+    console.error("Error updating localStorage:", error);
   }
 
-  return true
+  return true;
 }
 
 // Get total calories for a day
@@ -123,60 +178,69 @@ export function getMacrosForDay(date: Date) {
 }
 
 // Get favorite foods
-export function getFavoriteFoods() {
+export function getFavoriteFoods(): FoodItem[] {
   try {
-    return JSON.parse(localStorage.getItem("favoriteFoods") || "[]")
+    const storedData = localStorage.getItem("favoriteFoods");
+    if (!storedData) return [];
+
+    const parsed = JSON.parse(storedData) as unknown[];
+    const result = z.array(foodItemSchema).safeParse(parsed);
+    return result.success ? result.data : [];
   } catch (error) {
-    console.error("Error getting favorite foods:", error)
-    return []
+    console.error("Error getting favorite foods:", error);
+    return [];
   }
 }
 
 // Add a food to favorites
-export function addFavoriteFood(food: any) {
+export function addFavoriteFood(food: FoodItem): void {
   try {
-    const favorites = getFavoriteFoods()
-    if (!favorites.some((f: any) => f.id === food.id)) {
-      localStorage.setItem("favoriteFoods", JSON.stringify([...favorites, food]))
+    const favorites = getFavoriteFoods();
+    if (!favorites.some((f) => f.id === food.id)) {
+      localStorage.setItem("favoriteFoods", JSON.stringify([...favorites, food]));
     }
   } catch (error) {
-    console.error("Error adding favorite food:", error)
+    console.error("Error adding favorite food:", error);
   }
 }
 
 // Remove a food from favorites
-export function removeFavoriteFood(foodId: number | string) {
+export function removeFavoriteFood(foodId: number | string): void {
   try {
-    const favorites = getFavoriteFoods()
-    localStorage.setItem("favoriteFoods", JSON.stringify(favorites.filter((f: any) => f.id !== foodId)))
+    const favorites = getFavoriteFoods();
+    localStorage.setItem("favoriteFoods", JSON.stringify(favorites.filter((f) => f.id !== foodId)));
   } catch (error) {
-    console.error("Error removing favorite food:", error)
+    console.error("Error removing favorite food:", error);
   }
 }
 
 // Get custom foods
-export function getCustomFoods() {
+export function getCustomFoods(): FoodItem[] {
   try {
-    return JSON.parse(localStorage.getItem("customFoods") || "[]")
+    const storedData = localStorage.getItem("customFoods");
+    if (!storedData) return [];
+
+    const parsed = JSON.parse(storedData) as unknown[];
+    const result = z.array(foodItemSchema).safeParse(parsed);
+    return result.success ? result.data : [];
   } catch (error) {
-    console.error("Error getting custom foods:", error)
-    return []
+    console.error("Error getting custom foods:", error);
+    return [];
   }
 }
 
 // Add a custom food
-export function addCustomFood(food: any) {
+export function addCustomFood(food: FoodItem): FoodItem | null {
   try {
-    const customFoods = getCustomFoods()
-    const newFood = {
+    const customFoods = getCustomFoods();
+    const newFood: FoodItem = {
       ...food,
       id: food.id || Date.now(), // Use timestamp as ID if not provided
-      isCustom: true,
-    }
-    localStorage.setItem("customFoods", JSON.stringify([...customFoods, newFood]))
-    return newFood
+    };
+    localStorage.setItem("customFoods", JSON.stringify([...customFoods, newFood]));
+    return newFood;
   } catch (error) {
-    console.error("Error adding custom food:", error)
-    return null
+    console.error("Error adding custom food:", error);
+    return null;
   }
 }

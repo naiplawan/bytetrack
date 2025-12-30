@@ -1,8 +1,11 @@
+'use client';
+
 import type React from 'react';
 import { motion } from 'framer-motion';
 import { UseFormReturn } from 'react-hook-form';
 import { FormRadioGroup } from '@/components/ui/form-radio-group';
-import { thaiTranslations as t } from '@/lib/translations';
+import { t } from '@/lib/translations';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { fadeIn } from '@/lib/motion-variants';
 import type { OnboardingFormData } from '@/lib/validations/onboarding';
 import { TrendingDown, Minus, TrendingUp, Target, Lightbulb, Star } from 'lucide-react';
@@ -12,6 +15,7 @@ interface Step4Props {
 }
 
 export const Step4Goals: React.FC<Step4Props> = ({ form }) => {
+  const { language } = useLanguage();
   const {
     setValue,
     watch,
@@ -21,21 +25,21 @@ export const Step4Goals: React.FC<Step4Props> = ({ form }) => {
   const goalOptions = [
     {
       value: 'lose',
-      label: 'Lose Weight',
-      description: 'Create a sustainable calorie deficit for healthy weight loss',
+      label: t('step4_loseWeight_i18n', language),
+      description: t('step4_loseWeightDesc_i18n', language),
       icon: TrendingDown,
-      badge: 'Popular',
+      badge: t('step4_popular_i18n', language),
     },
     {
       value: 'maintain',
-      label: 'Maintain Weight',
-      description: 'Maintain your current weight with balanced nutrition',
+      label: t('step4_maintainWeight_i18n', language),
+      description: t('step4_maintainWeightDesc_i18n', language),
       icon: Minus,
     },
     {
       value: 'gain',
-      label: 'Gain Weight',
-      description: 'Build muscle and gain weight with strategic nutrition',
+      label: t('step4_gainWeight_i18n', language),
+      description: t('step4_gainWeightDesc_i18n', language),
       icon: TrendingUp,
     },
   ];
@@ -46,33 +50,35 @@ export const Step4Goals: React.FC<Step4Props> = ({ form }) => {
     switch (goal) {
       case 'lose':
         return {
-          title: 'Weight Loss Strategy',
-          description:
-            "We'll create a moderate calorie deficit (typically 300-500 calories below your TDEE) to promote sustainable weight loss of 1-2 pounds per week.",
+          title: t('step4_loseStrategyTitle_i18n', language),
+          description: t('step4_loseStrategyDesc_i18n', language),
           tips: [
-            'Focus on nutrient-dense foods',
-            'Maintain adequate protein intake',
-            'Stay hydrated',
-            'Include regular exercise',
+            t('step4_loseTip1_i18n', language),
+            t('step4_loseTip2_i18n', language),
+            t('step4_loseTip3_i18n', language),
+            t('step4_loseTip4_i18n', language),
           ],
         };
       case 'maintain':
         return {
-          title: 'Weight Maintenance',
-          description:
-            'Your target calories will match your TDEE to maintain your current weight while supporting your lifestyle and activity level.',
-          tips: ['Balance macronutrients', 'Listen to hunger cues', 'Stay consistent', 'Monitor portion sizes'],
+          title: t('step4_maintainStrategyTitle_i18n', language),
+          description: t('step4_maintainStrategyDesc_i18n', language),
+          tips: [
+            t('step4_maintainTip1_i18n', language),
+            t('step4_maintainTip2_i18n', language),
+            t('step4_maintainTip3_i18n', language),
+            t('step4_maintainTip4_i18n', language),
+          ],
         };
       case 'gain':
         return {
-          title: 'Healthy Weight Gain',
-          description:
-            "We'll create a moderate calorie surplus (typically 300-500 calories above your TDEE) to support healthy weight and muscle gain.",
+          title: t('step4_gainStrategyTitle_i18n', language),
+          description: t('step4_gainStrategyDesc_i18n', language),
           tips: [
-            'Emphasize protein intake',
-            'Include strength training',
-            'Choose nutrient-dense foods',
-            'Eat frequently',
+            t('step4_gainTip1_i18n', language),
+            t('step4_gainTip2_i18n', language),
+            t('step4_gainTip3_i18n', language),
+            t('step4_gainTip4_i18n', language),
           ],
         };
       default:
@@ -92,20 +98,16 @@ export const Step4Goals: React.FC<Step4Props> = ({ form }) => {
       exit="exit"
     >
       <div className="text-center mb-8">
-        <motion.div
-          className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full mb-6"
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-        >
+        <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full mb-6">
           <Target className="w-8 h-8 text-primary" />
-        </motion.div>
-        <h3 className="spotify-text-heading mb-3">What's Your Goal?</h3>
+        </div>
+        <h3 className="spotify-text-heading mb-3">{t('step4_title_i18n', language)}</h3>
         <p className="spotify-text-body text-muted-foreground max-w-2xl mx-auto">
-          Choose your primary health objective to get personalized recommendations tailored just for you
+          {t('step4_description_i18n', language)}
         </p>
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+      <div>
         <FormRadioGroup
           label=""
           value={watch('goal')}
@@ -118,17 +120,11 @@ export const Step4Goals: React.FC<Step4Props> = ({ form }) => {
           error={errors.goal?.message}
           className="space-y-4"
         />
-      </motion.div>
+      </div>
 
       {/* Dynamic Goal Explanation */}
       {goalInfo && (
-        <motion.div
-          className="mt-8 p-6 bg-gradient-to-br from-primary/5 via-background to-accent/5 rounded-xl border border-primary/20"
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-          key={selectedGoal}
-        >
+        <div className="mt-8 p-6 bg-gradient-to-br from-primary/5 via-background to-accent/5 rounded-xl border border-primary/20">
           <div className="flex items-start gap-4">
             <div className="w-6 h-6 bg-primary/20 rounded-full flex items-center justify-center mt-1">
               <Lightbulb className="w-4 h-4 text-primary" />
@@ -140,47 +136,38 @@ export const Step4Goals: React.FC<Step4Props> = ({ form }) => {
               </h4>
               <p className="text-sm text-muted-foreground mb-4">{goalInfo.description}</p>
               <div>
-                <p className="text-sm font-medium text-foreground mb-2">Key Strategies:</p>
+                <p className="text-sm font-medium text-foreground mb-2">{t('step4_keyStrategies_i18n', language)}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {goalInfo.tips.map((tip, index) => (
-                    <motion.div
+                    <div
                       key={index}
                       className="flex items-center gap-2 text-xs text-muted-foreground"
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.1 * index }}
                     >
                       <div className="w-1.5 h-1.5 bg-primary/60 rounded-full"></div>
                       <span>{tip}</span>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       )}
 
       {/* Success Tip */}
-      <motion.div
-        className="mt-6 p-4 bg-accent/5 rounded-xl border border-accent/20"
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.7 }}
-      >
+      <div className="mt-6 p-4 bg-accent/5 rounded-xl border border-accent/20">
         <div className="flex items-start gap-3">
           <div className="w-5 h-5 bg-accent/20 rounded-full flex items-center justify-center mt-0.5">
             <Star className="w-3 h-3 text-accent" />
           </div>
           <div>
-            <p className="text-sm font-medium text-foreground mb-1">Success Tip</p>
+            <p className="text-sm font-medium text-foreground mb-1">{t('step4_tipTitle_i18n', language)}</p>
             <p className="text-xs text-muted-foreground">
-              Remember, sustainable changes take time. Focus on building healthy habits rather than pursuing quick
-              fixes. Your personalized plan will help you achieve your goals safely and effectively.
+              {t('step4_tipDescription_i18n', language)}
             </p>
           </div>
         </div>
-      </motion.div>
+      </div>
     </motion.div>
   );
 };

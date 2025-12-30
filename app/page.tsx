@@ -24,34 +24,34 @@ const features = [
   {
     key: 'smartNutrition',
     icon: Apple,
-    titleKey: 'features_smartNutrition_title_i18n',
-    descriptionKey: 'features_smartNutrition_desc_i18n',
+    titleKey: 'features_smartNutrition_title_i18n' as const,
+    descriptionKey: 'features_smartNutrition_desc_i18n' as const,
   },
   {
     key: 'achievementSystem',
     icon: Award,
-    titleKey: 'features_achievementSystem_title_i18n',
-    descriptionKey: 'features_achievementSystem_desc_i18n',
+    titleKey: 'features_achievementSystem_title_i18n' as const,
+    descriptionKey: 'features_achievementSystem_desc_i18n' as const,
   },
   {
     key: 'wellnessIntegration',
     icon: Heart,
-    titleKey: 'features_wellnessIntegration_title_i18n',
-    descriptionKey: 'features_wellnessIntegration_desc_i18n',
+    titleKey: 'features_wellnessIntegration_title_i18n' as const,
+    descriptionKey: 'features_wellnessIntegration_desc_i18n' as const,
   },
   {
     key: 'activityTracking',
     icon: Zap,
-    titleKey: 'features_activityTracking_title_i18n',
-    descriptionKey: 'features_activityTracking_desc_i18n',
+    titleKey: 'features_activityTracking_title_i18n' as const,
+    descriptionKey: 'features_activityTracking_desc_i18n' as const,
   },
 ];
 
 const stats = [
-  { labelKey: 'stats_dailyActiveUsers_i18n', value: '10K+', icon: TrendingUp },
-  { labelKey: 'stats_weeklyGoalsAchieved_i18n', value: '50K+', icon: BarChart3 },
-  { labelKey: 'stats_totalMealsLogged_i18n', value: '25K+', icon: Target },
-  { labelKey: 'stats_userSatisfaction_i18n', value: '98%', icon: Calendar },
+  { labelKey: 'stats_dailyActiveUsers_i18n' as const, value: '10K+', icon: TrendingUp },
+  { labelKey: 'stats_weeklyGoalsAchieved_i18n' as const, value: '50K+', icon: BarChart3 },
+  { labelKey: 'stats_totalMealsLogged_i18n' as const, value: '25K+', icon: Target },
+  { labelKey: 'stats_userSatisfaction_i18n' as const, value: '98%', icon: Calendar },
 ];
 
 export default function Home() {

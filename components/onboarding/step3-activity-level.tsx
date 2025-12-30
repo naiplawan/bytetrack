@@ -2,7 +2,8 @@ import type React from 'react';
 import { motion } from 'framer-motion';
 import { UseFormReturn } from 'react-hook-form';
 import { FormRadioGroup } from '@/components/ui/form-radio-group';
-import { thaiTranslations as t } from '@/lib/translations';
+import { t } from '@/lib/translations';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { fadeIn } from '@/lib/motion-variants';
 import type { OnboardingFormData } from '@/lib/validations/onboarding';
 import { UserX, Zap, Activity, Dumbbell, Mountain, Heart, Info } from 'lucide-react';
@@ -12,6 +13,7 @@ interface Step3Props {
 }
 
 export const Step3ActivityLevel: React.FC<Step3Props> = ({ form }) => {
+  const { language } = useLanguage();
   const {
     setValue,
     watch,
@@ -21,36 +23,36 @@ export const Step3ActivityLevel: React.FC<Step3Props> = ({ form }) => {
   const activityOptions = [
     {
       value: 'sedentary',
-      label: 'Sedentary',
-      description: 'นั่งทำงานเป็นส่วนใหญ่ ไม่ได้ออกกำลังกาย',
+      label: t('activity_sedentary_i18n', language),
+      description: t('activity_sedentary_desc_i18n', language),
       icon: UserX,
       badge: 'x1.2',
     },
     {
       value: 'light',
-      label: 'Lightly Active',
-      description: 'ออกกำลังกายเบาๆ 1-3 วันต่อสัปดาห์',
+      label: t('activity_light_i18n', language),
+      description: t('activity_light_desc_i18n', language),
       icon: Zap,
       badge: 'x1.375',
     },
     {
       value: 'moderate',
-      label: 'Moderately Active',
-      description: 'ออกกำลังกายปานกลาง 3-5 วันต่อสัปดาห์',
+      label: t('activity_moderate_i18n', language),
+      description: t('activity_moderate_desc_i18n', language),
       icon: Activity,
       badge: 'x1.55',
     },
     {
       value: 'very',
-      label: 'Very Active',
-      description: 'ออกกำลังกายหนัก 6-7 วันต่อสัปดาห์',
+      label: t('activity_active_i18n', language),
+      description: t('activity_active_desc_i18n', language),
       icon: Dumbbell,
       badge: 'x1.725',
     },
     {
       value: 'extreme',
-      label: 'Extremely Active',
-      description: 'ออกกำลังกายหนักมาก หรือมีงานที่ต้องใช้แรงงาน',
+      label: t('activity_extreme_i18n', language),
+      description: t('activity_veryActive_desc_i18n', language),
       icon: Mountain,
       badge: 'x1.9',
     },
@@ -66,21 +68,16 @@ export const Step3ActivityLevel: React.FC<Step3Props> = ({ form }) => {
       exit="exit"
     >
       <div className="text-center mb-8">
-        <motion.div
-          className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full mb-6"
-          animate={{ rotate: [0, 10, -10, 0] }}
-          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-        >
+        <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full mb-6">
           <Heart className="w-8 h-8 text-primary" />
-        </motion.div>
-        <h3 className="spotify-text-heading mb-3">How Active Are You?</h3>
+        </div>
+        <h3 className="spotify-text-heading mb-3">{t('step3_title_i18n', language)}</h3>
         <p className="spotify-text-body text-muted-foreground max-w-2xl mx-auto">
-          Your activity level helps us calculate your Total Daily Energy Expenditure (TDEE) for accurate calorie
-          recommendations
+          {t('step3_description_i18n', language)}
         </p>
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+      <div>
         <FormRadioGroup
           label=""
           value={watch('activityLevel')}
@@ -93,42 +90,36 @@ export const Step3ActivityLevel: React.FC<Step3Props> = ({ form }) => {
           size="lg"
           error={errors.activityLevel?.message}
         />
-      </motion.div>
+      </div>
 
       {/* Information Card */}
-      <motion.div
-        className="mt-8 p-6 bg-primary/5 rounded-xl border border-primary/20"
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.5 }}
-      >
+      <div className="mt-8 p-6 bg-primary/5 rounded-xl border border-primary/20">
         <div className="flex items-start gap-4">
           <div className="w-6 h-6 bg-primary/20 rounded-full flex items-center justify-center mt-1">
             <Info className="w-4 h-4 text-primary" />
           </div>
           <div>
-            <p className="text-base font-medium text-foreground mb-2">Understanding Activity Multipliers</p>
+            <p className="text-base font-medium text-foreground mb-2">{t('step3_infoTitle_i18n', language)}</p>
             <p className="text-sm text-muted-foreground mb-3">
-              These multipliers are applied to your BMR to calculate your Total Daily Energy Expenditure (TDEE). Be
-              honest about your activity level for the most accurate calorie recommendations.
+              {t('step3_infoDescription_i18n', language)}
             </p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-muted rounded-full"></div>
-                <span className="text-muted-foreground">Sedentary: Desk job, minimal exercise</span>
+                <span className="text-muted-foreground">{t('activity_sedentary_i18n', language)}: {t('activity_sedentary_desc_i18n', language)}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-primary/60 rounded-full"></div>
-                <span className="text-muted-foreground">Light: Exercise 1-3 days/week</span>
+                <span className="text-muted-foreground">{t('activity_light_i18n', language)}: {t('activity_light_desc_i18n', language)}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-muted-foreground">Moderate: Exercise 3-5 days/week</span>
+                <span className="text-muted-foreground">{t('activity_moderate_i18n', language)}: {t('activity_moderate_desc_i18n', language)}</span>
               </div>
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </motion.div>
   );
 };

@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { UseFormReturn } from 'react-hook-form';
 import { Input } from '@/components/ui/modern-input';
 import { FormRadioGroup } from '@/components/ui/form-radio-group';
-import { thaiTranslations as t } from '@/lib/translations';
+import { t } from '@/lib/translations';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { fadeIn } from '@/lib/motion-variants';
 import type { OnboardingFormData } from '@/lib/validations/onboarding';
 import { Calendar, User2, Users, Sparkles } from 'lucide-react';
@@ -13,6 +14,7 @@ interface Step1Props {
 }
 
 export const Step1BasicInfo: React.FC<Step1Props> = ({ form }) => {
+  const { language } = useLanguage();
   const {
     register,
     setValue,
@@ -23,21 +25,21 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({ form }) => {
   const genderOptions = [
     {
       value: 'male',
-      label: 'Male',
+      label: t('step1_male_i18n', language),
       icon: User2,
-      description: 'Male',
+      description: t('step1_male_i18n', language),
     },
     {
       value: 'female',
-      label: 'Female',
+      label: t('step1_female_i18n', language),
       icon: Users,
-      description: 'Female',
+      description: t('step1_female_i18n', language),
     },
     {
       value: 'other',
-      label: 'Other',
+      label: t('step1_other_i18n', language),
       icon: User2,
-      description: 'Other',
+      description: t('step1_other_i18n', language),
     },
   ];
 
@@ -51,16 +53,12 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({ form }) => {
       exit="exit"
     >
       <div className="text-center mb-8">
-        <motion.div
-          className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full mb-6"
-          animate={{ rotate: [0, 5, -5, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        >
+        <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full mb-6">
           <Calendar className="w-8 h-8 text-primary" />
-        </motion.div>
-        <h3 className="spotify-text-heading mb-3">Tell us about yourself</h3>
+        </div>
+        <h3 className="spotify-text-heading mb-3">{t('step1_title_i18n', language)}</h3>
         <p className="spotify-text-body text-muted-foreground">
-          This helps us create a personalized experience just for you
+          {t('step1_description_i18n', language)}
         </p>
       </div>
 
@@ -83,16 +81,16 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({ form }) => {
           }}
         >
           <Input
-            label="Your Age"
+            label={t('step1_ageLabel_i18n', language)}
             type="number"
-            placeholder="Enter your age"
+            placeholder={t('step1_agePlaceholder_i18n', language)}
             min="18"
             max="100"
             error={errors.age?.message}
             leftIcon={<Calendar className="w-4 h-4" />}
             variant="glass"
             inputSize="lg"
-            helperText="We use this to calculate your personalized calorie needs"
+            helperText={t('step1_ageHelper_i18n', language)}
             {...register('age')}
           />
         </motion.div>
@@ -104,7 +102,7 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({ form }) => {
           }}
         >
           <div className="space-y-4">
-            <label className="block text-sm font-medium text-foreground">Gender</label>
+            <label className="block text-sm font-medium text-foreground">{t('step1_genderLabel_i18n', language)}</label>
             <FormRadioGroup
               label=""
               value={watch('gender')}
@@ -122,25 +120,19 @@ export const Step1BasicInfo: React.FC<Step1Props> = ({ form }) => {
         </motion.div>
       </motion.div>
 
-      <motion.div
-        className="mt-8 p-4 bg-primary/5 rounded-xl border border-primary/20"
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.5 }}
-      >
+      <div className="mt-8 p-4 bg-primary/5 rounded-xl border border-primary/20">
         <div className="flex items-start gap-3">
           <div className="w-5 h-5 bg-primary/20 rounded-full flex items-center justify-center mt-0.5">
             <Sparkles className="w-3 h-3 text-primary" />
           </div>
           <div>
-            <p className="text-sm font-medium text-foreground mb-1">Why we need this information</p>
+            <p className="text-sm font-medium text-foreground mb-1">{t('step2_infoTitle_i18n', language)}</p>
             <p className="text-xs text-muted-foreground">
-              Age and gender help us calculate your Basal Metabolic Rate (BMR) and provide accurate calorie
-              recommendations based on scientific formulas.
+              {t('step1_genderHelper_i18n', language)}
             </p>
           </div>
         </div>
-      </motion.div>
+      </div>
     </motion.div>
   );
 };

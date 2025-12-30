@@ -1,11 +1,13 @@
 // Comprehensive calorie and nutrition calculator
 
+export type Gender = 'male' | 'female' | 'other';
+
 // Calculate Basal Metabolic Rate (BMR) using the Mifflin-St Jeor Equation
 export function calculateBMR(
   weight: number, // in kg
   height: number, // in cm
   age: number,
-  gender: string
+  gender: Gender
 ): number {
   if (gender === 'male') {
     return Math.round(10 * weight + 6.25 * height - 5 * age + 5);

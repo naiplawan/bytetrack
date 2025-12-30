@@ -70,6 +70,10 @@ export const en = {
   onboarding_back_i18n: 'Back',
   onboarding_continue_i18n: 'Continue',
   onboarding_complete_i18n: 'Complete',
+  onboarding_completeSetup_i18n: 'Complete Setup',
+  onboarding_creatingPlan_i18n: 'Creating your plan...',
+  onboarding_step_i18n: 'Step',
+  onboarding_of_i18n: 'of',
 
   // Dashboard
   dashboard_foodPlan_i18n: 'Food Plan',
@@ -188,6 +192,182 @@ export const en = {
   meals_todayEntries_i18n: "Today's Entries",
   meals_noEntries_i18n: 'No entries yet',
   meals_addFirstMeal_i18n: 'Add your first meal to get started',
+
+  // Quick Actions
+  quickActions_title_i18n: 'Quick Actions',
+  quickActions_description_i18n: 'Common tasks and shortcuts',
+  quickActions_viewAnalytics_i18n: 'View Analytics',
+  quickActions_updateGoals_i18n: 'Update Goals',
+  quickActions_mealPlanning_i18n: 'Meal Planning',
+  quickActions_progressReport_i18n: 'Progress Report',
+
+  // Meals Add Page
+  meals_searchFoods_i18n: 'Search Foods',
+  meals_customEntry_i18n: 'Custom Entry',
+  meals_customFoodEntry_i18n: 'Custom Food Entry',
+  meals_foodName_i18n: 'Food Name',
+  meals_enterFoodName_i18n: 'Enter food name',
+  meals_calories_i18n: 'Calories',
+  meals_servingSize_i18n: 'Serving Size',
+  meals_recentQuickAdd_i18n: 'Recent & Quick Add',
+  meals_saveAsFavorite_i18n: 'Save as Favorite',
+  meals_addToBreakfast_i18n: 'Add to Breakfast',
+  meals_addToLunch_i18n: 'Add to Lunch',
+  meals_addToDinner_i18n: 'Add to Dinner',
+  meals_addToSnack_i18n: 'Add to Snack',
+  meals_foodDiary_i18n: 'Food Diary',
+  meals_loading_i18n: 'Loading...',
+  meals_failedToLoad_i18n: 'Failed to load food items. Please try again.',
+  meals_entryRemoved_i18n: 'Entry removed',
+  meals_addedTo_i18n: 'Added to',
+  meals_tryAdjustingSearch_i18n: 'Try adjusting your search terms',
+
+  // Error Page
+  error_title_i18n: 'Oops! Something went wrong',
+  error_description_i18n: "We encountered an unexpected error. Don't worry, we're on it!",
+  error_details_i18n: 'Error Details',
+  error_technicalInfo_i18n: 'Technical information about what went wrong',
+  error_tryAgain_i18n: 'Try Again',
+  error_goToDashboard_i18n: 'Go to Dashboard',
+  error_goBack_i18n: 'Go Back',
+  error_needHelp_i18n: 'Need Help?',
+  error_contactSupport_i18n: 'If this error persists, please contact our support team with the error ID above.',
+  error_commonCauses_i18n: 'Common causes: Network issues, server maintenance, or temporary glitches',
+
+  // Confirm Dialog
+  confirm_deleteTitle_i18n: 'Delete Entry',
+  confirm_deleteDescription_i18n: 'Are you sure you want to delete this entry? This action cannot be undone.',
+  confirm_cancel_i18n: 'Cancel',
+  confirm_delete_i18n: 'Delete',
+
+  // Activity Level Descriptions
+  activity_sedentary_desc_i18n: 'Little or no exercise, desk job',
+  activity_light_desc_i18n: 'Light exercise 1-3 days/week',
+  activity_moderate_desc_i18n: 'Moderate exercise 3-5 days/week',
+  activity_active_desc_i18n: 'Hard exercise 6-7 days/week',
+  activity_veryActive_desc_i18n: 'Very hard exercise, physical job',
+
+  // Recent Meals
+  recentMeals_title_i18n: "Today's Meals",
+  recentMeals_description_i18n: 'Your nutrition timeline',
+  recentMeals_addMeal_i18n: 'Add Meal',
+  recentMeals_noMeals_i18n: 'No meals logged yet',
+  recentMeals_noMealsDescription_i18n: 'Start tracking your nutrition by adding your first meal of the day.',
+  recentMeals_logFirstMeal_i18n: 'Log Your First Meal',
+
+  // Dashboard Stats
+  stats_caloriesToday_i18n: 'Calories Today',
+  stats_waterIntake_i18n: 'Water Intake',
+  stats_activeMinutes_i18n: 'Active Minutes',
+  stats_sleep_i18n: 'Sleep',
+  stats_glasses_i18n: 'glasses',
+  stats_min_i18n: 'min',
+  stats_hours_i18n: 'hours',
+
+  // Activity Level Labels
+  activity_sedentary_i18n: 'Sedentary',
+  activity_light_i18n: 'Lightly Active',
+  activity_moderate_i18n: 'Moderately Active',
+  activity_active_i18n: 'Very Active',
+  activity_extreme_i18n: 'Extremely Active',
+
+  // Step3 Activity Level
+  step3_title_i18n: 'How Active Are You?',
+  step3_description_i18n: 'Your activity level helps us calculate your Total Daily Energy Expenditure (TDEE) for accurate calorie recommendations',
+  step3_infoTitle_i18n: 'Understanding Activity Multipliers',
+  step3_infoDescription_i18n: 'These multipliers are applied to your BMR to calculate your Total Daily Energy Expenditure (TDEE). Be honest about your activity level for the most accurate calorie recommendations.',
+
+  // Coming Soon Pages
+  comingSoon_title_i18n: 'Coming Soon',
+  comingSoon_description_i18n: 'We are working hard to bring you this feature. Stay tuned!',
+  comingSoon_backToDashboard_i18n: 'Back to Dashboard',
+
+  // Analytics Page
+  analytics_title_i18n: 'Analytics',
+  analytics_description_i18n: 'Track your progress with detailed charts and insights',
+
+  // Goals Page
+  goals_title_i18n: 'Goals',
+  goals_description_i18n: 'Set and manage your health and fitness goals',
+
+  // Meal Planning Page
+  mealPlan_title_i18n: 'Meal Planning',
+  mealPlan_description_i18n: 'Plan your meals ahead for better nutrition',
+
+  // Calorie Overview
+  calorieOverview_title_i18n: 'Calorie Progress',
+  calorieOverview_description_i18n: 'Track your daily caloric intake and stay on target',
+  calorieOverview_overGoal_i18n: 'calories over goal',
+  calorieOverview_remaining_i18n: 'calories remaining',
+  calorieOverview_ofGoal_i18n: 'of daily goal',
+  calorieOverview_macros_i18n: 'Macronutrients',
+
+  // Dynamic Greeting
+  greeting_morning_i18n: 'Good morning',
+  greeting_afternoon_i18n: 'Good afternoon',
+  greeting_evening_i18n: 'Good evening',
+  greeting_subtitle_i18n: "Let's track your health journey today",
+
+  // Step 1 - Basic Info
+  step1_title_i18n: 'Tell us about yourself',
+  step1_description_i18n: 'This helps us personalize your experience',
+  step1_ageLabel_i18n: 'Your Age',
+  step1_ageHelper_i18n: 'We use this to calculate your personalized calorie needs',
+  step1_agePlaceholder_i18n: 'Enter your age',
+  step1_genderLabel_i18n: 'Gender',
+  step1_genderHelper_i18n: 'Biological sex affects metabolic rate calculations',
+  step1_male_i18n: 'Male',
+  step1_female_i18n: 'Female',
+  step1_other_i18n: 'Other',
+
+  // Step 2 - Body Measurements
+  step2_title_i18n: 'Body Measurements',
+  step2_description_i18n: 'These measurements help us calculate your ideal calorie intake',
+  step2_heightLabel_i18n: 'Height (cm)',
+  step2_heightPlaceholder_i18n: 'Enter your height',
+  step2_heightHelper_i18n: 'Your height in centimeters (e.g., 170 cm)',
+  step2_weightLabel_i18n: 'Current Weight (kg)',
+  step2_weightPlaceholder_i18n: 'Enter your weight',
+  step2_weightHelper_i18n: 'Your current weight in kilograms (e.g., 70 kg)',
+  step2_goalWeightLabel_i18n: 'Goal Weight (kg)',
+  step2_goalWeightPlaceholder_i18n: 'Enter your goal weight',
+  step2_goalWeightHelper_i18n: 'Your target weight goal in kilograms',
+  step2_infoTitle_i18n: 'Why We Need This',
+  step2_infoDescription_i18n: 'Your body measurements help us calculate your Basal Metabolic Rate (BMR) - the calories your body burns at rest.',
+  step2_tipTitle_i18n: 'Health Tip',
+  step2_tipDescription_i18n: 'A healthy rate of weight change is 0.5-1 kg per week',
+
+  // Step 4 - Goals
+  step4_title_i18n: "What's Your Goal?",
+  step4_description_i18n: 'Choose your primary health objective to get personalized recommendations tailored just for you',
+  step4_loseWeight_i18n: 'Lose Weight',
+  step4_loseWeightDesc_i18n: 'Create a sustainable calorie deficit for healthy weight loss',
+  step4_maintainWeight_i18n: 'Maintain Weight',
+  step4_maintainWeightDesc_i18n: 'Maintain your current weight with balanced nutrition',
+  step4_gainWeight_i18n: 'Gain Weight',
+  step4_gainWeightDesc_i18n: 'Build muscle and gain weight with strategic nutrition',
+  step4_popular_i18n: 'Popular',
+  step4_loseStrategyTitle_i18n: 'Weight Loss Strategy',
+  step4_loseStrategyDesc_i18n: "We'll create a moderate calorie deficit (typically 300-500 calories below your TDEE) to promote sustainable weight loss of 0.5-1 kg per week.",
+  step4_maintainStrategyTitle_i18n: 'Weight Maintenance',
+  step4_maintainStrategyDesc_i18n: 'Your target calories will match your TDEE to maintain your current weight while supporting your lifestyle and activity level.',
+  step4_gainStrategyTitle_i18n: 'Healthy Weight Gain',
+  step4_gainStrategyDesc_i18n: "We'll create a moderate calorie surplus (typically 300-500 calories above your TDEE) to support healthy weight and muscle gain.",
+  step4_keyStrategies_i18n: 'Key Strategies:',
+  step4_loseTip1_i18n: 'Focus on nutrient-dense foods',
+  step4_loseTip2_i18n: 'Maintain adequate protein intake',
+  step4_loseTip3_i18n: 'Stay hydrated',
+  step4_loseTip4_i18n: 'Include regular exercise',
+  step4_maintainTip1_i18n: 'Balance macronutrients',
+  step4_maintainTip2_i18n: 'Listen to hunger cues',
+  step4_maintainTip3_i18n: 'Stay consistent',
+  step4_maintainTip4_i18n: 'Monitor portion sizes',
+  step4_gainTip1_i18n: 'Emphasize protein intake',
+  step4_gainTip2_i18n: 'Include strength training',
+  step4_gainTip3_i18n: 'Choose nutrient-dense foods',
+  step4_gainTip4_i18n: 'Eat frequently',
+  step4_tipTitle_i18n: 'Success Tip',
+  step4_tipDescription_i18n: 'Remember, sustainable changes take time. Focus on building healthy habits rather than pursuing quick fixes. Your personalized plan will help you achieve your goals safely and effectively.',
 } as const;
 
 // Thai translations
@@ -261,6 +441,10 @@ export const th = {
   onboarding_back_i18n: 'ย้อนกลับ',
   onboarding_continue_i18n: 'ดำเนินการต่อ',
   onboarding_complete_i18n: 'เสร็จสิ้น',
+  onboarding_completeSetup_i18n: 'เสร็จสิ้นการตั้งค่า',
+  onboarding_creatingPlan_i18n: 'กำลังสร้างแผนของคุณ...',
+  onboarding_step_i18n: 'ขั้นตอน',
+  onboarding_of_i18n: 'จาก',
 
   // Dashboard
   dashboard_foodPlan_i18n: 'แผนอาหาร',
@@ -379,6 +563,182 @@ export const th = {
   meals_todayEntries_i18n: 'รายการวันนี้',
   meals_noEntries_i18n: 'ยังไม่มีรายการ',
   meals_addFirstMeal_i18n: 'เพิ่มมื้อแรกของคุณเพื่อเริ่มต้น',
+
+  // Quick Actions
+  quickActions_title_i18n: 'การดำเนินการด่วน',
+  quickActions_description_i18n: 'งานทั่วไปและทางลัด',
+  quickActions_viewAnalytics_i18n: 'ดูการวิเคราะห์',
+  quickActions_updateGoals_i18n: 'อัปเดตเป้าหมาย',
+  quickActions_mealPlanning_i18n: 'วางแผนมื้ออาหาร',
+  quickActions_progressReport_i18n: 'รายงานความคืบหน้า',
+
+  // Meals Add Page
+  meals_searchFoods_i18n: 'ค้นหาอาหาร',
+  meals_customEntry_i18n: 'รายการกำหนดเอง',
+  meals_customFoodEntry_i18n: 'รายการอาหารกำหนดเอง',
+  meals_foodName_i18n: 'ชื่ออาหาร',
+  meals_enterFoodName_i18n: 'กรอกชื่ออาหาร',
+  meals_calories_i18n: 'แคลอรี่',
+  meals_servingSize_i18n: 'ขนาดเสิร์ฟ',
+  meals_recentQuickAdd_i18n: 'ล่าสุด & เพิ่มด่วน',
+  meals_saveAsFavorite_i18n: 'บันทึกเป็นรายการโปรด',
+  meals_addToBreakfast_i18n: 'เพิ่มในอาหารเช้า',
+  meals_addToLunch_i18n: 'เพิ่มในอาหารกลางวัน',
+  meals_addToDinner_i18n: 'เพิ่มในอาหารเย็น',
+  meals_addToSnack_i18n: 'เพิ่มในอาหารว่าง',
+  meals_foodDiary_i18n: 'บันทึกอาหาร',
+  meals_loading_i18n: 'กำลังโหลด...',
+  meals_failedToLoad_i18n: 'ไม่สามารถโหลดรายการอาหารได้ กรุณาลองอีกครั้ง',
+  meals_entryRemoved_i18n: 'ลบรายการแล้ว',
+  meals_addedTo_i18n: 'เพิ่มใน',
+  meals_tryAdjustingSearch_i18n: 'ลองปรับคำค้นหาของคุณ',
+
+  // Error Page
+  error_title_i18n: 'อ๊ะ! เกิดข้อผิดพลาด',
+  error_description_i18n: 'เราพบข้อผิดพลาดที่ไม่คาดคิด ไม่ต้องกังวล เรากำลังแก้ไข!',
+  error_details_i18n: 'รายละเอียดข้อผิดพลาด',
+  error_technicalInfo_i18n: 'ข้อมูลทางเทคนิคเกี่ยวกับสิ่งที่ผิดพลาด',
+  error_tryAgain_i18n: 'ลองอีกครั้ง',
+  error_goToDashboard_i18n: 'ไปที่แดชบอร์ด',
+  error_goBack_i18n: 'ย้อนกลับ',
+  error_needHelp_i18n: 'ต้องการความช่วยเหลือ?',
+  error_contactSupport_i18n: 'หากข้อผิดพลาดนี้ยังคงอยู่ กรุณาติดต่อทีมสนับสนุนของเราพร้อม ID ข้อผิดพลาดด้านบน',
+  error_commonCauses_i18n: 'สาเหตุทั่วไป: ปัญหาเครือข่าย, การบำรุงรักษาเซิร์ฟเวอร์ หรือข้อผิดพลาดชั่วคราว',
+
+  // Confirm Dialog
+  confirm_deleteTitle_i18n: 'ลบรายการ',
+  confirm_deleteDescription_i18n: 'คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้? การดำเนินการนี้ไม่สามารถยกเลิกได้',
+  confirm_cancel_i18n: 'ยกเลิก',
+  confirm_delete_i18n: 'ลบ',
+
+  // Activity Level Descriptions
+  activity_sedentary_desc_i18n: 'ออกกำลังกายเล็กน้อยหรือไม่ออกเลย, งานนั่งโต๊ะ',
+  activity_light_desc_i18n: 'ออกกำลังกายเบาๆ 1-3 วัน/สัปดาห์',
+  activity_moderate_desc_i18n: 'ออกกำลังกายปานกลาง 3-5 วัน/สัปดาห์',
+  activity_active_desc_i18n: 'ออกกำลังกายหนัก 6-7 วัน/สัปดาห์',
+  activity_veryActive_desc_i18n: 'ออกกำลังกายหนักมาก, งานใช้แรงกาย',
+
+  // Recent Meals
+  recentMeals_title_i18n: 'มื้ออาหารวันนี้',
+  recentMeals_description_i18n: 'ไทม์ไลน์โภชนาการของคุณ',
+  recentMeals_addMeal_i18n: 'เพิ่มมื้ออาหาร',
+  recentMeals_noMeals_i18n: 'ยังไม่มีมื้ออาหารที่บันทึก',
+  recentMeals_noMealsDescription_i18n: 'เริ่มติดตามโภชนาการโดยเพิ่มมื้อแรกของวัน',
+  recentMeals_logFirstMeal_i18n: 'บันทึกมื้อแรก',
+
+  // Dashboard Stats
+  stats_caloriesToday_i18n: 'แคลอรี่วันนี้',
+  stats_waterIntake_i18n: 'การดื่มน้ำ',
+  stats_activeMinutes_i18n: 'นาทีที่เคลื่อนไหว',
+  stats_sleep_i18n: 'การนอน',
+  stats_glasses_i18n: 'แก้ว',
+  stats_min_i18n: 'นาที',
+  stats_hours_i18n: 'ชั่วโมง',
+
+  // Activity Level Labels
+  activity_sedentary_i18n: 'นั่งอยู่กับที่',
+  activity_light_i18n: 'กิจกรรมเบา',
+  activity_moderate_i18n: 'กิจกรรมปานกลาง',
+  activity_active_i18n: 'กิจกรรมมาก',
+  activity_extreme_i18n: 'กิจกรรมหนักมาก',
+
+  // Step3 Activity Level
+  step3_title_i18n: 'คุณมีกิจกรรมมากแค่ไหน?',
+  step3_description_i18n: 'ระดับกิจกรรมของคุณช่วยให้เราคำนวณพลังงานที่ใช้ต่อวัน (TDEE) เพื่อคำแนะนำแคลอรี่ที่แม่นยำ',
+  step3_infoTitle_i18n: 'ทำความเข้าใจตัวคูณกิจกรรม',
+  step3_infoDescription_i18n: 'ตัวคูณเหล่านี้ใช้กับ BMR ของคุณเพื่อคำนวณพลังงานที่ใช้ต่อวัน (TDEE) ซื่อสัตย์เกี่ยวกับระดับกิจกรรมของคุณเพื่อคำแนะนำแคลอรี่ที่แม่นยำที่สุด',
+
+  // Coming Soon Pages
+  comingSoon_title_i18n: 'เร็วๆ นี้',
+  comingSoon_description_i18n: 'เรากำลังพัฒนาฟีเจอร์นี้อยู่ โปรดติดตาม!',
+  comingSoon_backToDashboard_i18n: 'กลับไปแดชบอร์ด',
+
+  // Analytics Page
+  analytics_title_i18n: 'การวิเคราะห์',
+  analytics_description_i18n: 'ติดตามความคืบหน้าด้วยแผนภูมิและข้อมูลเชิงลึก',
+
+  // Goals Page
+  goals_title_i18n: 'เป้าหมาย',
+  goals_description_i18n: 'ตั้งและจัดการเป้าหมายสุขภาพและฟิตเนส',
+
+  // Meal Planning Page
+  mealPlan_title_i18n: 'วางแผนมื้ออาหาร',
+  mealPlan_description_i18n: 'วางแผนมื้ออาหารล่วงหน้าเพื่อโภชนาการที่ดีขึ้น',
+
+  // Calorie Overview
+  calorieOverview_title_i18n: 'ความคืบหน้าแคลอรี่',
+  calorieOverview_description_i18n: 'ติดตามการบริโภคแคลอรี่รายวันและบรรลุเป้าหมาย',
+  calorieOverview_overGoal_i18n: 'แคลอรี่เกินเป้าหมาย',
+  calorieOverview_remaining_i18n: 'แคลอรี่ที่เหลือ',
+  calorieOverview_ofGoal_i18n: 'ของเป้าหมายรายวัน',
+  calorieOverview_macros_i18n: 'สารอาหารหลัก',
+
+  // Dynamic Greeting
+  greeting_morning_i18n: 'สวัสดีตอนเช้า',
+  greeting_afternoon_i18n: 'สวัสดีตอนบ่าย',
+  greeting_evening_i18n: 'สวัสดีตอนเย็น',
+  greeting_subtitle_i18n: 'มาติดตามเส้นทางสุขภาพของคุณวันนี้กันเถอะ',
+
+  // Step 1 - Basic Info
+  step1_title_i18n: 'บอกเราเกี่ยวกับตัวคุณ',
+  step1_description_i18n: 'ข้อมูลนี้ช่วยให้เราปรับแต่งประสบการณ์ของคุณ',
+  step1_ageLabel_i18n: 'อายุของคุณ',
+  step1_ageHelper_i18n: 'เราใช้ข้อมูลนี้เพื่อคำนวณความต้องการแคลอรี่ส่วนบุคคล',
+  step1_agePlaceholder_i18n: 'ระบุอายุของคุณ',
+  step1_genderLabel_i18n: 'เพศ',
+  step1_genderHelper_i18n: 'เพศทางชีววิทยาส่งผลต่อการคำนวณอัตราการเผาผลาญ',
+  step1_male_i18n: 'ชาย',
+  step1_female_i18n: 'หญิง',
+  step1_other_i18n: 'อื่นๆ',
+
+  // Step 2 - Body Measurements
+  step2_title_i18n: 'ขนาดร่างกาย',
+  step2_description_i18n: 'การวัดเหล่านี้ช่วยให้เราคำนวณปริมาณแคลอรี่ที่เหมาะสม',
+  step2_heightLabel_i18n: 'ส่วนสูง (ซม.)',
+  step2_heightPlaceholder_i18n: 'ระบุส่วนสูงของคุณ',
+  step2_heightHelper_i18n: 'ส่วนสูงของคุณเป็นเซนติเมตร (เช่น 170 ซม.)',
+  step2_weightLabel_i18n: 'น้ำหนักปัจจุบัน (กก.)',
+  step2_weightPlaceholder_i18n: 'ระบุน้ำหนักของคุณ',
+  step2_weightHelper_i18n: 'น้ำหนักปัจจุบันของคุณเป็นกิโลกรัม (เช่น 70 กก.)',
+  step2_goalWeightLabel_i18n: 'น้ำหนักเป้าหมาย (กก.)',
+  step2_goalWeightPlaceholder_i18n: 'ระบุน้ำหนักเป้าหมาย',
+  step2_goalWeightHelper_i18n: 'น้ำหนักเป้าหมายของคุณเป็นกิโลกรัม',
+  step2_infoTitle_i18n: 'ทำไมเราต้องการข้อมูลนี้',
+  step2_infoDescription_i18n: 'การวัดร่างกายช่วยให้เราคำนวณอัตราการเผาผลาญพื้นฐาน (BMR) - แคลอรี่ที่ร่างกายเผาผลาญขณะพัก',
+  step2_tipTitle_i18n: 'เคล็ดลับสุขภาพ',
+  step2_tipDescription_i18n: 'อัตราการเปลี่ยนแปลงน้ำหนักที่ดีต่อสุขภาพคือ 0.5-1 กก. ต่อสัปดาห์',
+
+  // Step 4 - Goals
+  step4_title_i18n: 'เป้าหมายของคุณคืออะไร?',
+  step4_description_i18n: 'เลือกเป้าหมายหลักด้านสุขภาพเพื่อรับคำแนะนำส่วนบุคคลที่เหมาะกับคุณ',
+  step4_loseWeight_i18n: 'ลดน้ำหนัก',
+  step4_loseWeightDesc_i18n: 'สร้างการขาดดุลแคลอรี่อย่างยั่งยืนเพื่อการลดน้ำหนักที่ดีต่อสุขภาพ',
+  step4_maintainWeight_i18n: 'รักษาน้ำหนัก',
+  step4_maintainWeightDesc_i18n: 'รักษาน้ำหนักปัจจุบันด้วยโภชนาการที่สมดุล',
+  step4_gainWeight_i18n: 'เพิ่มน้ำหนัก',
+  step4_gainWeightDesc_i18n: 'สร้างกล้ามเนื้อและเพิ่มน้ำหนักด้วยโภชนาการเชิงกลยุทธ์',
+  step4_popular_i18n: 'ยอดนิยม',
+  step4_loseStrategyTitle_i18n: 'กลยุทธ์การลดน้ำหนัก',
+  step4_loseStrategyDesc_i18n: 'เราจะสร้างการขาดดุลแคลอรี่ปานกลาง (โดยทั่วไป 300-500 แคลอรี่ต่ำกว่า TDEE) เพื่อส่งเสริมการลดน้ำหนักอย่างยั่งยืน 0.5-1 กก. ต่อสัปดาห์',
+  step4_maintainStrategyTitle_i18n: 'การรักษาน้ำหนัก',
+  step4_maintainStrategyDesc_i18n: 'เป้าหมายแคลอรี่ของคุณจะตรงกับ TDEE เพื่อรักษาน้ำหนักปัจจุบันขณะสนับสนุนไลฟ์สไตล์และระดับกิจกรรมของคุณ',
+  step4_gainStrategyTitle_i18n: 'การเพิ่มน้ำหนักอย่างสุขภาพ',
+  step4_gainStrategyDesc_i18n: 'เราจะสร้างแคลอรี่ส่วนเกินปานกลาง (โดยทั่วไป 300-500 แคลอรี่เหนือ TDEE) เพื่อสนับสนุนการเพิ่มน้ำหนักและกล้ามเนื้อที่ดีต่อสุขภาพ',
+  step4_keyStrategies_i18n: 'กลยุทธ์สำคัญ:',
+  step4_loseTip1_i18n: 'เน้นอาหารที่มีสารอาหารหนาแน่น',
+  step4_loseTip2_i18n: 'รักษาปริมาณโปรตีนที่เพียงพอ',
+  step4_loseTip3_i18n: 'ดื่มน้ำให้เพียงพอ',
+  step4_loseTip4_i18n: 'รวมการออกกำลังกายเป็นประจำ',
+  step4_maintainTip1_i18n: 'สมดุลสารอาหารหลัก',
+  step4_maintainTip2_i18n: 'ฟังสัญญาณความหิว',
+  step4_maintainTip3_i18n: 'รักษาความสม่ำเสมอ',
+  step4_maintainTip4_i18n: 'ควบคุมขนาดส่วน',
+  step4_gainTip1_i18n: 'เน้นปริมาณโปรตีน',
+  step4_gainTip2_i18n: 'รวมการฝึกความแข็งแรง',
+  step4_gainTip3_i18n: 'เลือกอาหารที่มีสารอาหารหนาแน่น',
+  step4_gainTip4_i18n: 'กินบ่อยๆ',
+  step4_tipTitle_i18n: 'เคล็ดลับความสำเร็จ',
+  step4_tipDescription_i18n: 'จำไว้ว่าการเปลี่ยนแปลงอย่างยั่งยืนต้องใช้เวลา มุ่งเน้นการสร้างนิสัยที่ดีต่อสุขภาพแทนที่จะไล่ตามวิธีแก้ไขด่วน แผนส่วนบุคคลของคุณจะช่วยให้คุณบรรลุเป้าหมายอย่างปลอดภัยและมีประสิทธิภาพ',
 } as const;
 
 export type TranslationKeys = keyof typeof en;
@@ -408,9 +768,9 @@ export const getTranslations = (lang?: Language) => {
   return selectedLang === 'en' ? en : th;
 };
 
-export const t = (key: string, lang?: Language): string => {
+export const t = (key: TranslationKeys, lang?: Language): string => {
   const translations = getTranslations(lang);
-  return (translations as any)[key] || key;
+  return translations[key];
 };
 
 // Legacy support - keeping this for backwards compatibility
