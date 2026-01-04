@@ -1,11 +1,11 @@
 # ByteTrack
 
-A modern calorie tracking and wellness application built with Next.js 15. Features bilingual support (English/Thai), integration with Open Food Facts API for 3M+ foods, and a beautiful UI inspired by Apple and Spotify design systems.
+A modern calorie tracking and wellness application with a separated architecture. Features bilingual support (English/Thai), integration with Open Food Facts API for 3M+ foods, and a beautiful UI inspired by Apple and Spotify design systems.
 
 ## Features
 
 ### Food Tracking
-- **Open Food Facts API Integration**: Access to 3M+ foods worldwide
+- **Open Food Facts API Integration**: Access to 3M+ foods worldwide (proxied via backend)
 - **Local Thai Food Database**: 20+ authentic Thai dishes with accurate nutrition data
 - **Combined Search**: Searches local database first, then API for comprehensive results
 - **Barcode Scanning Ready**: API support for barcode lookup
@@ -24,21 +24,71 @@ A modern calorie tracking and wellness application built with Next.js 15. Featur
 - **Responsive Design**: Mobile-first approach, works on all devices
 - **Accessibility**: WCAG 2.1 AA compliant
 
+## Architecture
+
+ByteTrack uses a separated client-server architecture:
+
+```
+bytetrack/
+├── frontend/          # Next.js 16 client application
+└── backend/           # Go Fiber API server
+```
+
 ## Tech Stack
 
+### Frontend
 | Category | Technology |
 |----------|------------|
-| Framework | Next.js 15.2.4 (App Router) |
+| Framework | Next.js 16.1.1 (App Router) |
 | Language | TypeScript |
 | Styling | Tailwind CSS |
 | Animations | Framer Motion |
 | Forms | React Hook Form + Zod |
 | Icons | Lucide React |
-| Food API | Open Food Facts (free, no API key) |
+| State | React Context |
+
+### Backend
+| Category | Technology |
+|----------|------------|
+| Framework | Go Fiber v2 |
+| Database | PostgreSQL |
+| Auth | JWT Tokens (access + refresh) |
+| Password | bcrypt |
+| Driver | pgx/v5 |
 
 ## Quick Start
 
+### Prerequisites
+- Node.js 18+
+- Go 1.21+
+- PostgreSQL 14+
+
+### Backend Setup
+
 ```bash
+cd backend
+
+# Copy environment variables
+cp .env.example .env
+
+# Edit .env with your database credentials
+# DB_HOST=localhost
+# DB_PORT=5432
+# DB_USER=bytetrack
+# DB_PASSWORD=your_password
+# DB_NAME=bytetrack
+
+# Run migrations and start server
+go run cmd/api/main.go
+```
+
+Backend runs on [http://localhost:8080](http://localhost:8080)
+
+### Frontend Setup
+
+```bash
+cd frontend
+
 # Install dependencies
 npm install
 
@@ -52,113 +102,133 @@ npm run build
 npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Frontend runs on [http://localhost:3000](http://localhost:3000)
 
 ## Project Structure
 
 ```
 bytetrack/
-├── app/
-│   ├── page.tsx              # Landing page
-│   ├── dashboard/            # Main dashboard
-│   ├── meals/                # Food diary
-│   │   ├── page.tsx          # Meals list with search
-│   │   ├── add/              # Add food entry
-│   │   └── plan/             # Meal planning (coming soon)
-│   ├── onboarding/           # User setup flow
-│   ├── analytics/            # Analytics (coming soon)
-│   └── goals/                # Goals management (coming soon)
-├── components/
-│   ├── ui/                   # Reusable UI components
-│   ├── dashboard/            # Dashboard-specific components
-│   └── onboarding/           # Onboarding step components
-├── lib/
-│   ├── food-api.ts           # Open Food Facts + local database
-│   ├── thai-food-api.ts      # Backward-compatible food API
-│   ├── calorie-calculator.ts # BMR/TDEE calculations
-│   ├── translations.ts       # i18n translations (EN/TH)
-│   └── validations/          # Zod schemas
-└── contexts/
-    └── LanguageContext.tsx   # Language state management
+├── frontend/                    # Next.js 16 application
+│   ├── app/
+│   │   ├── page.tsx            # Landing page
+│   │   ├── dashboard/          # Main dashboard
+│   │   ├── meals/              # Food diary
+│   │   └── onboarding/         # User setup flow
+│   ├── components/
+│   │   ├── ui/                 # Reusable UI components
+│   │   ├── dashboard/          # Dashboard-specific components
+│   │   └── onboarding/         # Onboarding step components
+│   ├── lib/
+│   │   ├── api-client.ts       # Backend API client
+│   │   ├── translations.ts     # i18n translations (EN/TH)
+│   │   └── validations/        # Zod schemas
+│   ├── contexts/
+│   │   └── LanguageContext.tsx # Language state management
+│   └── package.json
+│
+└── backend/                     # Go Fiber API server
+    ├── cmd/api/main.go         # Application entry point
+    ├── internal/
+    │   ├── api/
+    │   │   ├── handler/        # HTTP request handlers
+    │   │   ├── middleware/     # Auth, CORS, logger
+    │   │   └── router.go       # Route configuration
+    │   ├── domain/
+    │   │   ├── entity/         # Domain entities
+    │   │   └── service/        # Business logic
+    │   ├── infrastructure/
+    │   │   ├── config/         # Configuration loading
+    │   │   ├── database/       # PostgreSQL + migrations
+    │   │   ├── repository/     # Data access layer
+    │   │   └── external/       # Open Food Facts client
+    │   └── pkg/
+    │       ├── jwt/            # JWT utilities
+    │       └── password/       # Password hashing
+    ├── go.mod
+    └── .env.example
 ```
 
-## Food API
+## API Endpoints
 
-### Search Foods
-```typescript
-import { searchFoods } from '@/lib/thai-food-api';
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/auth/register` | Register new user |
+| POST | `/api/v1/auth/login` | Login user |
+| POST | `/api/v1/auth/refresh` | Refresh JWT token |
+| POST | `/api/v1/auth/logout` | Logout user |
 
-// Combines local Thai foods + Open Food Facts API
-const results = await searchFoods('chicken');
-```
+### User Profile
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/user/profile` | Get user profile |
+| PUT | `/api/v1/user/profile` | Update user profile |
 
-### Local Thai Foods Only
-```typescript
-import { searchLocalThaiFoods } from '@/lib/thai-food-api';
+### Onboarding
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/onboarding/complete` | Complete onboarding |
+| GET | `/api/v1/onboarding/status` | Check onboarding status |
 
-const thaiFoods = await searchLocalThaiFoods('ไก่');
-```
+### Meals
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/meals` | Get meals (with date filter) |
+| POST | `/api/v1/meals` | Create meal |
+| GET | `/api/v1/meals/:id` | Get meal by ID |
+| PUT | `/api/v1/meals/:id` | Update meal |
+| DELETE | `/api/v1/meals/:id` | Delete meal |
+| GET | `/api/v1/meals/daily/:date` | Get daily stats |
 
-### Barcode Lookup
-```typescript
-import { scanBarcode } from '@/lib/thai-food-api';
+### Foods
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/foods/search` | Search foods (local + API) |
+| GET | `/api/v1/foods/thai` | Get Thai foods |
+| GET | `/api/v1/foods/barcode/:barcode` | Lookup by barcode |
 
-const food = await scanBarcode('8850999220017');
-```
-
-### Available Functions
-
-| Function | Description |
-|----------|-------------|
-| `searchFoods(query)` | Combined search (Thai + API) |
-| `searchLocalThaiFoods(query)` | Thai foods only |
-| `getThaiFood()` | Get all local Thai foods |
-| `scanBarcode(barcode)` | Lookup by barcode |
-| `getCategories()` | Get food categories |
-
-## Translations
-
-The app supports English and Thai. Translations are managed in `lib/translations.ts`.
-
-```typescript
-import { t } from '@/lib/translations';
-import { useLanguage } from '@/contexts/LanguageContext';
-
-function MyComponent() {
-  const { language } = useLanguage();
-  return <h1>{t('dashboard_title_i18n', language)}</h1>;
-}
-```
-
-## Calorie Calculations
-
-Uses scientifically-backed formulas:
-
-- **BMR**: Mifflin-St Jeor equation
-- **TDEE**: BMR × Activity multiplier
-- **Goal Adjustment**: ±300-500 calories based on goal
-
-```typescript
-import { calculateBMR, calculateTDEE } from '@/lib/calorie-calculator';
-
-const bmr = calculateBMR({ age: 25, gender: 'male', height: 175, weight: 70 });
-const tdee = calculateTDEE(bmr, 'moderate');
-```
+### Favorites & Custom Foods
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/favorites` | Get favorite foods |
+| POST | `/api/v1/favorites` | Add to favorites |
+| DELETE | `/api/v1/favorites/:id` | Remove from favorites |
+| GET | `/api/v1/custom-foods` | Get custom foods |
+| POST | `/api/v1/custom-foods` | Create custom food |
+| DELETE | `/api/v1/custom-foods/:id` | Delete custom food |
 
 ## Environment Variables
 
-No environment variables required. The Open Food Facts API is free and doesn't need an API key.
-
-Optional configuration can be added in `.env.local`:
-
+### Backend (.env)
 ```env
-# Optional: Analytics, etc.
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+SERVER_PORT=8080
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=bytetrack
+DB_PASSWORD=your_password
+DB_NAME=bytetrack
+JWT_SECRET=your-super-secret-key
+CORS_ALLOWED_ORIGINS=http://localhost:3000
+```
+
+### Frontend (.env.local)
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8080
 ```
 
 ## Scripts
 
+### Backend
 ```bash
+cd backend
+go run cmd/api/main.go    # Development server
+go build -o bytetrack     # Build binary
+./bytetrack               # Run production server
+```
+
+### Frontend
+```bash
+cd frontend
 npm run dev       # Development server
 npm run build     # Production build
 npm run start     # Production server
@@ -186,13 +256,19 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## Acknowledgments
 
+### Frontend
 - [Next.js](https://nextjs.org/) - React framework
 - [Tailwind CSS](https://tailwindcss.com/) - CSS framework
 - [Framer Motion](https://www.framer.com/motion/) - Animation library
-- [Open Food Facts](https://world.openfoodfacts.org/) - Food database API
 - [Lucide](https://lucide.dev/) - Icon library
 - [shadcn/ui](https://ui.shadcn.com/) - Component inspiration
 
+### Backend
+- [Fiber](https://gofiber.io/) - Web framework
+- [pgx](https://github.com/jackc/pgx) - PostgreSQL driver
+- [golang-jwt](https://github.com/golang-jwt/jwt) - JWT implementation
+- [Open Food Facts](https://world.openfoodfacts.org/) - Food database API
+
 ---
 
-Built with Next.js, TypeScript, and Tailwind CSS.
+Built with Next.js 16, Go Fiber, PostgreSQL, and TypeScript.
