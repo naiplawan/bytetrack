@@ -1,495 +1,547 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-feature-settings: 'rlig' 1, 'calt' 1;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  /* Modern Container Utilities */
-  .modern-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
-
-  .modern-section {
-    @apply py-12 lg:py-16;
-  }
-
-  /* Apple-inspired Card System */
-  .apple-card {
-    @apply bg-card/80 backdrop-blur-xl rounded-2xl border border-border/20 shadow-sm hover:shadow-lg transition-all duration-300 hover:bg-card/90;
-  }
-
-  .apple-card-compact {
-    @apply bg-card/60 backdrop-blur-lg rounded-xl border border-border/10 shadow-sm hover:shadow-md transition-all duration-200 hover:bg-card/80;
-  }
-
-  .apple-card-interactive {
-    @apply apple-card hover:scale-[1.01] hover:shadow-xl cursor-pointer transform-gpu;
-  }
-
-  /* Spotify-inspired Elements */
-  .spotify-glass {
-    @apply bg-card/10 backdrop-blur-2xl border border-white/5 rounded-2xl;
-  }
-
-  .spotify-backdrop {
-    @apply bg-background/95 backdrop-blur-xl border border-border/20 rounded-2xl;
-  }
-
-  /* Modern Button System */
-  .btn-primary {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-6 py-3 font-semibold transition-all duration-200 hover:scale-[1.02] shadow-lg hover:shadow-primary/25;
-  }
-
-  .btn-secondary {
-    @apply bg-secondary/80 text-secondary-foreground hover:bg-secondary rounded-xl px-6 py-3 font-medium transition-all duration-200 hover:scale-[1.02];
-  }
-
-  .btn-ghost {
-    @apply bg-transparent text-foreground hover:bg-accent/10 rounded-xl px-6 py-3 font-medium transition-all duration-200;
-  }
-
-  .btn-outline {
-    @apply bg-transparent border-2 border-border text-foreground hover:border-primary hover:text-primary hover:bg-primary/5 rounded-xl px-6 py-3 font-medium transition-all duration-200;
-  }
-
-  /* Typography System */
-  .text-display {
-    @apply text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight tracking-tight;
-  }
-
-  .text-hero {
-    @apply text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight bg-gradient-to-r from-foreground via-foreground to-foreground/80 bg-clip-text text-transparent;
-  }
-
-  .text-heading-1 {
-    @apply text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-foreground;
-  }
-
-  .text-heading-2 {
-    @apply text-2xl sm:text-3xl font-semibold leading-tight tracking-tight text-foreground;
-  }
-
-  .text-heading-3 {
-    @apply text-xl sm:text-2xl font-semibold leading-tight text-foreground;
-  }
-
-  .text-body-large {
-    @apply text-lg leading-relaxed text-foreground/90;
-  }
-
-  .text-body {
-    @apply text-base leading-relaxed text-muted-foreground;
-  }
-
-  .text-body-small {
-    @apply text-sm leading-relaxed text-muted-foreground;
-  }
-
-  .text-caption {
-    @apply text-xs leading-normal text-muted-foreground;
-  }
-
-  /* Spotify Design System Typography */
-  .spotify-text-display {
-    @apply text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight tracking-tight;
-  }
-
-  .spotify-text-hero {
-    @apply text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight bg-gradient-to-r from-foreground via-foreground to-foreground/80 bg-clip-text text-transparent;
-  }
-
-  .spotify-text-heading {
-    @apply text-2xl sm:text-3xl font-semibold leading-tight tracking-tight text-foreground;
-  }
-
-  .spotify-text-subheading {
-    @apply text-xl sm:text-2xl font-semibold leading-tight text-foreground;
-  }
-
-  .spotify-text-body {
-    @apply text-base leading-relaxed text-muted-foreground;
-  }
-
-  .spotify-text-small {
-    @apply text-sm leading-relaxed text-muted-foreground;
-  }
-
-  .spotify-text-gradient {
-    @apply bg-gradient-to-r from-primary via-primary to-primary/80 bg-clip-text text-transparent font-bold;
-  }
-
-  /* Layout Utilities */
-  .flex-center {
-    @apply flex items-center justify-center;
-  }
-
-  .flex-between {
-    @apply flex items-center justify-between;
-  }
-
-  .flex-start {
-    @apply flex items-center justify-start;
-  }
-
-  .grid-auto {
-    @apply grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
-  }
-
-  /* Spotify Layout Utilities */
-  .spotify-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
-
-  .spotify-section {
-    @apply py-12 lg:py-16;
-  }
-
-  .spotify-grid {
-    @apply grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
-  }
-
-  .spotify-flex-center {
-    @apply flex items-center justify-center;
-  }
-
-  .spotify-flex-between {
-    @apply flex items-center justify-between;
-  }
-
-  /* Interactive States */
-  .interactive-scale {
-    @apply transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98];
-  }
-
-  .interactive-lift {
-    @apply transition-all duration-200 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg;
-  }
-
-  .interactive-glow {
-    @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/20;
-  }
-
-  /* Form Elements */
-  .form-input {
-    @apply w-full rounded-xl border border-border bg-background/50 px-4 py-3 text-sm transition-all duration-200 placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50;
-  }
-
-  .form-label {
-    @apply text-sm font-medium text-foreground mb-2 block;
-  }
-
-  .form-error {
-    @apply text-sm text-destructive mt-1;
-  }
-
-  /* Progress and Status */
-  .progress-bar {
-    @apply h-2 bg-muted rounded-full overflow-hidden;
-  }
-
-  .progress-fill {
-    @apply h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-500;
-  }
-
-  /* Spotify Card System */
-  .spotify-card {
-    @apply bg-card/80 backdrop-blur-xl rounded-2xl border border-border/20 shadow-sm hover:shadow-lg transition-all duration-300 hover:bg-card/90;
-  }
-
-  .spotify-card-compact {
-    @apply bg-card/60 backdrop-blur-lg rounded-xl border border-border/10 shadow-sm hover:shadow-md transition-all duration-200 hover:bg-card/80;
-  }
-
-  .spotify-card-interactive {
-    @apply spotify-card hover:scale-[1.01] hover:shadow-xl cursor-pointer transform-gpu;
-  }
-
-  /* Spotify Interactive Elements */
-  .spotify-hover-lift {
-    @apply transition-all duration-200 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg;
-  }
-
-  .spotify-glow {
-    @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/20;
-  }
-
-  /* Spotify Progress System */
-  .spotify-progress-bar {
-    @apply h-2 bg-muted/40 rounded-full overflow-hidden backdrop-blur-sm;
-  }
-
-  .spotify-progress-fill {
-    @apply h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-500;
-  }
-
-  /* Navigation */
-  .nav-item {
-    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent/10 transition-all duration-200 font-medium;
-  }
-
-  .nav-item-active {
-    @apply nav-item bg-primary/10 text-primary font-semibold;
-  }
-
-  /* Spotify Navigation */
-  .spotify-nav-item {
-    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent/10 transition-all duration-200 font-medium;
-  }
-
-  .spotify-nav-item-active {
-    @apply spotify-nav-item bg-primary/10 text-primary font-semibold;
-  }
-
-  /* Scrollbars */
-  .modern-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: hsl(var(--muted-foreground) / 0.2) transparent;
-  }
-
-  .modern-scrollbar::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  .modern-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .modern-scrollbar::-webkit-scrollbar-thumb {
-    background-color: hsl(var(--muted-foreground) / 0.2);
-    border-radius: 3px;
-  }
-
-  .modern-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(var(--muted-foreground) / 0.4);
-  }
-
-  /* Spotify Scrollbar */
-  .spotify-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: hsl(var(--primary) / 0.2) transparent;
-  }
-
-  .spotify-scrollbar::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  .spotify-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .spotify-scrollbar::-webkit-scrollbar-thumb {
-    background-color: hsl(var(--primary) / 0.2);
-    border-radius: 3px;
-  }
-
-  .spotify-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(var(--primary) / 0.4);
-  }
-
-  /* Glass Effects */
-  .glass-card {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl;
-  }
-
-  .glass-nav {
-    @apply bg-background/80 backdrop-blur-xl border-b border-border/20;
-  }
-
-  /* Animations */
-  .animate-slide-up {
-    animation: slideUp 0.5s ease-out;
-  }
-
-  .animate-fade-in {
-    animation: fadeIn 0.3s ease-out;
-  }
-
-  .animate-scale-in {
-    animation: scaleIn 0.2s ease-out;
-  }
-
-  /* Spotify Animations */
-  .animate-glow {
-    animation: glow 2s ease-in-out infinite alternate;
-  }
-
-  .animate-bounce-subtle {
-    animation: bounceSubtle 1s ease-in-out infinite;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes glow {
-  from {
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 10px rgba(255, 255, 255, 0.4);
-  }
-  to {
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.7), 0 0 20px rgba(255, 255, 255, 0.3);
-  }
-}
-
-@keyframes bounceSubtle {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-/* Focus visible styles for better accessibility */
-.focus-visible-ring {
-  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background;
-}
-
-/* Consistent shadow system */
-.shadow-subtle {
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-}
-
-.shadow-card {
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-}
-
-.shadow-elevated {
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-}
-
-.shadow-glow {
-  box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
-}
-
 @layer base {
   :root {
-    /* Spotify Light Theme (less common, but for accessibility) */
+    /* Fresh Wellness Theme */
     --background: 0 0% 98%;
-    --foreground: 0 0% 5%;
+    --foreground: 120 20% 12%;
+
+    /* Card Layers */
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 5%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 5%;
-    --primary: 142 76% 36%; /* Spotify Green */
+    --card-foreground: 120 20% 12%;
+
+    /* Vitality Green */
+    --primary: 142 65% 45%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 94%;
-    --muted-foreground: 0 0% 40%;
-    --accent: 142 76% 36%;
+
+    /* Sky Blue */
+    --secondary: 195 80% 55%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Energy Orange */
+    --accent: 28 95% 55%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
+
+    /* Muted Elements */
+    --muted: 120 15% 94%;
+    --muted-foreground: 120 10% 45%;
+
+    /* Destructive */
+    --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 90%;
-    --input: 0 0% 94%;
-    --ring: 142 76% 36%;
-    --chart-1: 142 76% 36%;
-    --chart-2: 25 95% 53%;
-    --chart-3: 340 82% 52%;
-    --chart-4: 271 81% 56%;
-    --chart-5: 41 96% 40%;
-    --radius: 0.75rem;
-    --sidebar-background: 0 0% 7%;
-    --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 142 76% 36%;
+
+    /* Borders & Inputs */
+    --border: 120 15% 88%;
+    --input: 120 10% 94%;
+    --ring: 142 65% 45%;
+
+    /* Chart Colors - Fresh Palette */
+    --chart-1: 142 65% 45%;
+    --chart-2: 195 80% 55%;
+    --chart-3: 28 95% 55%;
+    --chart-4: 270 70% 60%;
+    --chart-5: 160 75% 45%;
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 120 20% 12%;
+    --sidebar-primary: 142 65% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 12%;
-    --sidebar-accent-foreground: 0 0% 90%;
-    --sidebar-border: 0 0% 15%;
-    --sidebar-ring: 142 76% 36%;
+    --sidebar-accent: 120 15% 94%;
+    --sidebar-accent-foreground: 120 20% 12%;
+    --sidebar-border: 120 15% 90%;
+    --sidebar-ring: 142 65% 45%;
+
+    --radius: 1.25rem;
   }
+
   .dark {
-    /* Spotify Dark Theme (primary theme) */
-    --background: 0 0% 7%; /* Spotify's dark background */
+    --background: 120 15% 5%;
     --foreground: 0 0% 95%;
-    --card: 0 0% 9%; /* Darker cards */
+
+    --card: 120 15% 8%;
     --card-foreground: 0 0% 95%;
-    --popover: 0 0% 9%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 142 76% 36%; /* Spotify Green #1db954 */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 15%; /* Darker secondary */
-    --secondary-foreground: 0 0% 95%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 65%;
-    --accent: 142 76% 36%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 18%; /* Subtle borders */
-    --input: 0 0% 15%;
-    --ring: 142 76% 36%;
-    --chart-1: 142 76% 36%; /* Spotify Green */
-    --chart-2: 25 95% 53%; /* Orange */
-    --chart-3: 340 82% 52%; /* Pink */
-    --chart-4: 271 81% 56%; /* Purple */
-    --chart-5: 41 96% 40%; /* Yellow */
-    --sidebar-background: 0 0% 5%; /* Very dark sidebar */
+
+    --muted: 120 15% 15%;
+    --muted-foreground: 120 10% 60%;
+
+    --border: 120 15% 18%;
+    --input: 120 15% 15%;
+
+    --sidebar-background: 120 15% 6%;
     --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 142 76% 36%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 12%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 0 0% 15%;
-    --sidebar-ring: 142 76% 36%;
+    --sidebar-accent: 120 15% 12%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 120 15% 18%;
   }
 
   * {
-    border-color: hsl(var(--border));
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-['Plus_Jakarta_Sans'];
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .heading-font {
+    @apply font-['Playfair_Display'];
   }
 }
 
-body {
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
+/* Fresh Gradient Background */
+.wellness-bg {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfeff 50%, #fef3c7 100%);
+}
+
+/* Hero Image with Overlay */
+.hero-section {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+/* Organic Shapes */
+.organic-blob {
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+}
+
+.organic-blob-2 {
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+}
+
+/* Vitality Gradient */
+.vitality-gradient {
+  background: linear-gradient(135deg, #22c55e 0%, #14b8a6 50%, #f97316 100%);
+}
+
+/* Fresh Button Styles */
+.btn-vitality {
+  @apply bg-primary text-white font-semibold px-8 py-4 rounded-full;
+  box-shadow: 0 10px 40px rgba(34, 197, 94, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-vitality:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 50px rgba(34, 197, 94, 0.4);
+}
+
+/* Wellness Cards */
+.wellness-card {
+  @apply bg-white rounded-3xl border border-green-100;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wellness-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+/* Progress Ring */
+.progress-ring {
+  transform: rotate(-90deg);
+}
+
+.progress-ring-circle {
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Achievement Badge */
+.achievement-badge {
+  @apply relative inline-flex;
+}
+
+.achievement-badge::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  background: linear-gradient(135deg, #22c55e, #14b8a6, #f97316);
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.achievement-badge:hover::before {
+  opacity: 1;
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Stat Card with Icon Glow */
+.stat-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--stat-gradient, linear-gradient(90deg, #22c55e, #14b8a6));
+}
+
+.stat-card-green { --stat-gradient: linear-gradient(90deg, #22c55e, #16a34a); }
+.stat-card-blue { --stat-gradient: linear-gradient(90deg, #0ea5e9, #0284c7); }
+.stat-card-orange { --stat-gradient: linear-gradient(90deg, #f97316, #ea580c); }
+.stat-card-purple { --stat-gradient: linear-gradient(90deg, #a855f7, #9333ea); }
+
+/* Food Item Card */
+.food-card {
+  @apply bg-white rounded-2xl p-4 border border-green-50;
+  transition: all 0.3s ease;
+}
+
+.food-card:hover {
+  @apply border-green-200;
+  box-shadow: 0 8px 30px rgba(34, 197, 94, 0.12);
+  transform: scale(1.02);
+}
+
+/* Macro Nutrient Bars */
+.macro-bar {
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #f1f5f9;
+}
+
+.macro-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.macro-protein { background: linear-gradient(90deg, #22c55e, #16a34a); }
+.macro-carbs { background: linear-gradient(90deg, #14b8a6, #0d9488); }
+.macro-fat { background: linear-gradient(90deg, #f97316, #ea580c); }
+
+/* Water Intake Wave */
+.water-wave {
+  position: relative;
+  overflow: hidden;
+}
+
+.water-wave::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--water-level, 50%);
+  background: linear-gradient(180deg, rgba(14, 165, 233, 0.6) 0%, rgba(14, 165, 233, 0.9) 100%);
+  border-radius: inherit;
+  transition: height 0.5s ease;
+}
+
+/* Activity Ring */
+.activity-ring {
+  stroke-dasharray: 283;
+  stroke-dashoffset: var(--offset, 70);
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+/* Meal Time Badge */
+.meal-badge {
+  @apply inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium;
+}
+
+.meal-breakfast { @apply bg-amber-100 text-amber-700; }
+.meal-lunch { @apply bg-green-100 text-green-700; }
+.meal-dinner { @apply bg-purple-100 text-purple-700; }
+.meal-snack { @apply bg-blue-100 text-blue-700; }
+
+/* Streak Flame Animation */
+@keyframes flame {
+  0%, 100% {
+    transform: scale(1) rotate(-2deg);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(1.05) rotate(0deg);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.02) rotate(2deg);
+    opacity: 1;
+  }
+  75% {
+    transform: scale(1.05) rotate(0deg);
+    opacity: 0.9;
+  }
+}
+
+.streak-flame {
+  animation: flame 1.5s ease-in-out infinite;
+}
+
+/* Goal Progress with Celebration */
+.goal-celebrate {
+  position: relative;
+}
+
+.goal-celebrate.achieved::after {
+  content: '🎉';
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: 1.5rem;
+  animation: bounce 0.5s ease infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Custom Scrollbar */
+.wellness-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(34, 197, 94, 0.3) transparent;
+}
+
+.wellness-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.wellness-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.wellness-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(34, 197, 94, 0.3);
+  border-radius: 4px;
+}
+
+.wellness-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 197, 94, 0.5);
+}
+
+/* Floating Leaf Decoration */
+@keyframes floatLeaf {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-20px) rotate(10deg);
+    opacity: 0.8;
+  }
+}
+
+.float-leaf {
+  animation: floatLeaf 6s ease-in-out infinite;
+}
+
+/* Smooth Page Transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.4s ease-out;
+}
+
+/* Input Styles */
+.wellness-input {
+  @apply w-full px-5 py-4 rounded-2xl border border-green-200 bg-white;
+  transition: all 0.3s ease;
+  @apply focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100;
+}
+
+/* Chart Container */
+.chart-card {
+  @apply bg-white rounded-3xl p-6 border border-green-50;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Typography Gradients */
+.text-gradient-vitality {
+  background: linear-gradient(135deg, #22c55e 0%, #14b8a6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-energy {
+  background: linear-gradient(135deg, #f97316 0%, #eab308 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-calm {
+  background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Quick Action Button */
+.quick-action {
+  @apply flex flex-col items-center justify-center p-6 rounded-3xl bg-white border border-green-100;
+  transition: all 0.3s ease;
+}
+
+.quick-action:hover {
+  @apply border-green-300;
+  box-shadow: 0 10px 30px rgba(34, 197, 94, 0.15);
+  transform: translateY(-4px);
+}
+
+.quick-action:active {
+  transform: translateY(-2px);
+}
+
+/* Skeleton Loading */
+.wellness-skeleton {
+  @apply bg-gradient-to-r from-green-50 via-green-100 to-green-50;
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Nutrition Label */
+.nutrition-label {
+  @apply flex items-center justify-between py-3 border-b border-green-100;
+}
+
+.nutrition-label:last-child {
+  @apply border-b-0;
+}
+
+/* Day Selector */
+.day-selector {
+  @apply flex flex-col items-center justify-center w-14 h-14 rounded-2xl cursor-pointer transition-all duration-300;
+}
+
+.day-selector.active {
+  @apply bg-primary text-white;
+  box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+}
+
+.day-selector:not(.active):hover {
+  @apply bg-green-50;
+}
+
+/* Weekly Progress Bar */
+.weekly-bar {
+  @apply h-2 bg-green-100 rounded-full overflow-hidden;
+}
+
+.weekly-fill {
+  @apply h-full bg-gradient-to-r from-green-500 to-green-400 rounded-full;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Achievement Card */
+.achievement-card {
+  @apply relative overflow-hidden rounded-3xl p-6 bg-white border border-green-100;
+}
+
+.achievement-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(20, 184, 166, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.achievement-card:hover::before {
+  opacity: 1;
+}
+
+/* Heartbeat Animation */
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  10%, 30% { transform: scale(1.1); }
+  20%, 40% { transform: scale(1); }
+}
+
+.heartbeat {
+  animation: heartbeat 2s ease-in-out infinite;
+}
+
+/* Navigation Link */
+.nav-wellness {
+  @apply flex items-center gap-3 px-5 py-3 rounded-2xl transition-all duration-300;
+}
+
+.nav-wellness:hover {
+  @apply bg-green-50;
+}
+
+.nav-wellness.active {
+  @apply bg-primary text-white;
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  @apply fixed inset-0 bg-black/30 backdrop-blur-sm z-50;
+}
+
+/* Date Picker Wellness */
+.date-wellness {
+  @apply px-4 py-2 rounded-xl border border-green-200 bg-white text-center;
+  transition: all 0.2s ease;
+}
+
+.date-wellness:hover {
+  @apply border-green-400 bg-green-50;
+}
+
+.date-wellness.selected {
+  @apply bg-primary text-white border-primary;
+}
+
+/* Responsive Helpers */
+@media (max-width: 768px) {
+  .hero-section {
+    min-height: auto;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+}
+
+/* Focus Styles for Accessibility */
+*:focus-visible {
+  @apply outline-none ring-2 ring-green-500 ring-offset-2;
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
 }
