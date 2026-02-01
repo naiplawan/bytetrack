@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Noto_Sans_Thai } from 'next/font/google';
+import { Lora, Raleway } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
@@ -7,15 +7,21 @@ import { ConditionalLayout } from '@/components/conditional-layout';
 import LanguageToggle from '@/components/language-toggle';
 import { LangProvider } from '@/components/lang-provider';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { AuthProvider } from '@/contexts/AuthContext';
 
-const inter = Inter({
+// NEW: Vibrant & Block-based typography
+const lora = Lora({
   subsets: ['latin'],
-  variable: '--font-inter',
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-lora',
+  display: 'swap',
 });
 
-const notoSansThai = Noto_Sans_Thai({
-  subsets: ['thai'],
-  variable: '--font-noto-sans-thai',
+const raleway = Raleway({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-raleway',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -25,7 +31,7 @@ export const metadata: Metadata = {
   keywords: ['calorie tracker', 'health', 'wellness', 'diet', 'fitness', 'thai food'],
   authors: [{ name: 'ByteTrack Team' }],
   openGraph: {
-    title: 'ByteTrack ',
+    title: 'ByteTrack',
     description: 'Track your health journey with our comprehensive calorie and wellness app',
     type: 'website',
   },
@@ -38,14 +44,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${notoSansThai.variable} font-sans antialiased`}>
+      <body className={`${lora.variable} ${raleway.variable} font-sans antialiased`}>
         <LangProvider>
           <LanguageProvider>
-            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-              <ConditionalLayout>{children}</ConditionalLayout>
-              <LanguageToggle />
-              <Toaster />
-            </ThemeProvider>
+            <AuthProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="light"
+                enableSystem
+                disableTransitionOnChange
+              >
+                <ConditionalLayout>{children}</ConditionalLayout>
+                <LanguageToggle />
+                <Toaster />
+              </ThemeProvider>
+            </AuthProvider>
           </LanguageProvider>
         </LangProvider>
       </body>

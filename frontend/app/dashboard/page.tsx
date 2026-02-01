@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { toast } from 'sonner';
 import {
   TrendingUp,
@@ -17,8 +18,20 @@ import {
   ChevronRight,
   Flame,
   Sparkles,
+  Minus,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
+import { getMealsByDate, getTotalCaloriesForDay, getMacrosForDay } from '@/lib/meal-service';
+import { BrandCard, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { EmptyState } from '@/components/ui/empty-state';
+import { SmartInsights, DailyTipCard } from '@/components/SmartInsights';
 
 // Dashboard Components
 function CalorieRing({ goal, consumed, size = 180 }: { goal: number; consumed: number; size?: number }) {
@@ -36,7 +49,7 @@ function CalorieRing({ goal, consumed, size = 180 }: { goal: number; consumed: n
             cy={size / 2}
             r={80}
             fill="none"
-            stroke="#f1f5f9"
+            stroke="hsl(var(--muted))"
             strokeWidth={16}
           />
           <circle
@@ -53,25 +66,31 @@ function CalorieRing({ goal, consumed, size = 180 }: { goal: number; consumed: n
           />
           <defs>
             <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#22c55e" />
-              <stop offset="100%" stopColor="#14b8a6" />
+              <stop offset="0%" stopColor="hsl(var(--primary))" />
+              <stop offset="100%" stopColor="hsl(var(--secondary))" />
             </linearGradient>
           </defs>
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-4xl font-bold text-gray-800">{consumed}</span>
-          <span className="text-sm text-gray-500">of {goal} kcal</span>
+          <span className="text-4xl font-bold text-foreground">{consumed}</span>
+          <span className="text-sm text-muted-foreground">of {goal} kcal</span>
         </div>
       </div>
       <div className="mt-4 text-center">
-        <p className="text-2xl font-bold text-gradient-vitality">{percentage}%</p>
-        <p className="text-sm text-gray-500">Daily Goal</p>
+        <p className="text-2xl font-bold text-primary">{percentage}%</p>
+        <p className="text-sm text-muted-foreground">Daily Goal</p>
       </div>
     </div>
   );
 }
 
-function MacroBar({ label, current, goal, color, icon: Icon }: {
+function MacroBar({
+  label,
+  current,
+  goal,
+  color,
+  icon: Icon
+}: {
   label: string;
   current: number;
   goal: number;
@@ -84,21 +103,14 @@ function MacroBar({ label, current, goal, color, icon: Icon }: {
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Icon className="w-4 h-4 text-gray-500" />
-          <span className="text-sm font-medium text-gray-700">{label}</span>
+          <Icon className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm font-medium">{label}</span>
         </div>
-        <span className="text-sm text-gray-600">
-          <span className="font-semibold">{current}</span> / {goal}g
+        <span className="text-sm text-muted-foreground">
+          <span className="font-semibold text-foreground">{current}</span> / {goal}g
         </span>
       </div>
-      <div className="macro-bar">
-        <motion.div
-          className={`macro-bar-fill ${color}`}
-          initial={{ width: 0 }}
-          animate={{ width: `${percentage}%` }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        />
-      </div>
+      <Progress value={percentage} className="h-2" />
     </div>
   );
 }
@@ -121,15 +133,15 @@ function StatCard({
   return (
     <motion.div
       whileHover={{ y: -4 }}
-      className={`stat-card ${gradient} bg-white rounded-3xl p-6`}
+      className={`${gradient} bg-card rounded-3xl p-6 border border-border/50 shadow-sm`}
     >
       <div className={`w-14 h-14 rounded-2xl ${color} flex items-center justify-center mb-4`}>
         <Icon className="w-7 h-7" />
       </div>
-      <p className="text-sm text-gray-500 mb-1">{label}</p>
-      <p className="text-2xl font-bold text-gray-800">
+      <p className="text-sm text-muted-foreground mb-1">{label}</p>
+      <p className="text-2xl font-bold text-foreground">
         {value}
-        <span className="text-base font-normal text-gray-500 ml-1">{unit}</span>
+        <span className="text-base font-normal text-muted-foreground ml-1">{unit}</span>
       </p>
     </motion.div>
   );
@@ -142,41 +154,41 @@ function MealCard({ name, time, calories, items, image }: {
   items: string;
   image?: string;
 }) {
-  const getBadgeClass = () => {
+  const getBadgeVariant = (): "default" | "secondary" | "outline" | "destructive" => {
     switch (name.toLowerCase()) {
-      case 'breakfast': return 'meal-breakfast';
-      case 'lunch': return 'meal-lunch';
-      case 'dinner': return 'meal-dinner';
-      default: return 'meal-snack';
+      case 'breakfast': return 'default';
+      case 'lunch': return 'secondary';
+      case 'dinner': return 'outline';
+      default: return 'destructive';
     }
   };
 
   return (
     <motion.div
       whileHover={{ scale: 1.02 }}
-      className="food-card cursor-pointer"
+      className="food-card bg-card rounded-2xl p-4 border border-border/50 cursor-pointer hover:shadow-md transition-all"
     >
       <div className="flex items-start gap-4">
         {image ? (
-          <img
+          <Image
             src={image}
             alt={name}
-            className="w-16 h-16 rounded-xl object-cover flex-shrink-0"
+            width={64}
+            height={64}
+            className="rounded-xl object-cover flex-shrink-0"
           />
         ) : (
-          <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-green-100 to-teal-100 flex items-center justify-center flex-shrink-0">
-            <Apple className="w-8 h-8 text-green-600" />
+          <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <Apple className="w-8 h-8 text-primary" />
           </div>
         )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-2">
-            <span className={`meal-badge ${getBadgeClass()} text-xs`}>
-              {name}
-            </span>
-            <span className="text-xs text-gray-400">{time}</span>
+            <Badge variant={getBadgeVariant()}>{name}</Badge>
+            <span className="text-xs text-muted-foreground">{time}</span>
           </div>
-          <p className="font-semibold text-gray-800 truncate mb-1">{items}</p>
-          <p className="text-sm text-gray-500">{calories} kcal</p>
+          <p className="font-semibold text-foreground truncate mb-1">{items}</p>
+          <p className="text-sm text-muted-foreground">{calories} kcal</p>
         </div>
       </div>
     </motion.div>
@@ -199,12 +211,12 @@ function QuickActionButton({
       whileHover={{ y: -4 }}
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
-      className="quick-action"
+      className="quick-action bg-card rounded-3xl p-6 border border-border/50 hover:border-border transition-all"
     >
       <div className={`w-14 h-14 rounded-2xl ${color} flex items-center justify-center mb-3`}>
         <Icon className="w-7 h-7" />
       </div>
-      <span className="text-sm font-medium text-gray-700">{label}</span>
+      <span className="text-sm font-medium">{label}</span>
     </motion.button>
   );
 }
@@ -215,47 +227,120 @@ function StreakBadge({ days }: { days: number }) {
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
       transition={{ type: 'spring', stiffness: 200 }}
-      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-100 to-orange-100"
+      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20"
     >
-      <Flame className="w-5 h-5 text-orange-600 streak-flame" />
-      <span className="font-bold text-orange-700">{days} Day Streak!</span>
+      <Flame className="w-5 h-5 text-primary streak-flame" />
+      <span className="font-bold text-primary">{days} Day Streak!</span>
     </motion.div>
   );
 }
 
+const animation = {
+  duration: {
+    progress: '800ms',
+  }
+};
+
 export default function DashboardPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
-  const [userData, setUserData] = useState<{
-    targetCalories?: number;
-    macroTargets?: { carbs: number; protein: number; fat: number };
-  } | null>(null);
+  const { profile, isLoading: authLoading } = useAuth();
+  const [dashboardData, setDashboardData] = useState({
+    isLoading: true,
+    meals: [] as any[],
+    waterIntake: 0,
+    activeMinutes: 0,
+  });
+  const [todayMeals, setTodayMeals] = useState<any[]>([]);
+  const [waterIntake, setWaterIntake] = useState(0);
+  const [activeMinutes, setActiveMinutes] = useState(0);
+  const [showActivityDialog, setShowActivityDialog] = useState(false);
 
+  // Load dashboard data
   useEffect(() => {
-    const loadUserData = () => {
+    const loadData = async () => {
+      if (!profile) return;
+
       try {
-        const stored = localStorage.getItem('userData');
-        if (stored) {
-          setUserData(JSON.parse(stored));
-        }
+        setDashboardData(prev => ({ ...prev, isLoading: true }));
+
+        // Load today's meals
+        const today = new Date();
+        const meals = await getMealsByDate(today);
+        setDashboardData(prev => ({ ...prev, meals }));
+
+        // Load daily stats from localStorage
+        const dailyStats = JSON.parse(localStorage.getItem('dailyStats') || '{"water": 0, "activeMinutes": 0}');
+        setDashboardData(prev => ({
+          ...prev,
+          waterIntake: dailyStats.water || 0,
+          activeMinutes: dailyStats.activeMinutes || 0,
+        }));
+
       } catch (error) {
-        console.error('Error loading user data:', error);
+        console.error('Error loading dashboard data:', error);
         toast.error('Failed to load your data. Please try refreshing.');
       } finally {
-        setIsLoading(false);
+        setDashboardData(prev => ({ ...prev, isLoading: false }));
       }
     };
 
-    loadUserData();
-  }, []);
+    if (profile) {
+      loadData();
+    }
+  }, [profile]);
 
-  if (isLoading) {
+  // Calculate real daily stats from profile
+  const calorieGoal = profile?.target_calories || 2000;
+  const caloriesConsumed = dashboardData.meals.reduce((sum, meal) => sum + meal.calories, 0);
+  const caloriesRemaining = calorieGoal - caloriesConsumed;
+
+  const macros = profile || { protein_target: 120, carb_target: 200, fat_target: 55 };
+  const macrosConsumed = dashboardData.meals.reduce(
+    (acc, meal) => ({
+      protein: acc.protein + (meal.protein || 0),
+      carbs: acc.carbs + (meal.carbs || 0),
+      fat: acc.fat + (meal.fat || 0),
+    }),
+    { protein: 0, carbs: 0, fat: 0 }
+  );
+
+  const waterGoal = profile?.water_target || 8;
+
+  // Update water intake
+  const updateWaterIntake = (delta: number) => {
+    const newAmount = Math.max(0, Math.min(20, dashboardData.waterIntake + delta));
+    setDashboardData(prev => ({ ...prev, waterIntake: newAmount }));
+
+    const dailyStats = JSON.parse(localStorage.getItem('dailyStats') || '{}');
+    dailyStats.water = newAmount;
+    localStorage.setItem('dailyStats', JSON.stringify(dailyStats));
+
+    if (delta > 0 && newAmount === waterGoal) {
+      toast.success('Water goal reached! 💧');
+    }
+  };
+
+  // Add activity
+  const addActivity = (minutes: number) => {
+    const newMinutes = dashboardData.activeMinutes + minutes;
+    setDashboardData(prev => ({ ...prev, activeMinutes: newMinutes }));
+
+    const dailyStats = JSON.parse(localStorage.getItem('dailyStats') || '{}');
+    dailyStats.activeMinutes = newMinutes;
+    localStorage.setItem('dailyStats', JSON.stringify(dailyStats));
+
+    toast.success(`Added ${minutes} minutes of activity! 💪`);
+    setShowActivityDialog(false);
+  };
+
+  // Check authentication
+  if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-teal-50 to-amber-50 p-6">
+      <div className="min-h-screen bg-gradient-hero p-6">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-64 wellness-skeleton rounded-3xl" />
+              <Skeleton key={i} className="h-64 rounded-3xl" />
             ))}
           </div>
         </div>
@@ -263,43 +348,66 @@ export default function DashboardPage() {
     );
   }
 
-  const calorieGoal = userData?.targetCalories || 2000;
-  const caloriesConsumed = 1450;
-  const caloriesRemaining = calorieGoal - caloriesConsumed;
+  // Redirect to onboarding if not authenticated
+  if (!profile) {
+    router.push('/onboarding');
+    return null;
+  }
 
-  const macros = userData?.macroTargets || { protein: 120, carbs: 200, fat: 55 };
-  const macrosConsumed = { protein: 85, carbs: 150, fat: 35 };
+  if (dashboardData.isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-hero p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Skeleton key={i} className="h-64 rounded-3xl" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  const stats = [
-    { label: 'Calories', value: caloriesConsumed.toString(), unit: 'kcal', icon: TrendingUp, color: 'text-green-600', bg: 'bg-green-100', gradient: 'stat-card-green' },
-    { label: 'Water', value: '6', unit: 'glasses', icon: Droplets, color: 'text-blue-600', bg: 'bg-blue-100', gradient: 'stat-card-blue' },
-    { label: 'Active', value: '45', unit: 'min', icon: Activity, color: 'text-orange-600', bg: 'bg-orange-100', gradient: 'stat-card-orange' },
-    { label: 'Sleep', value: '7.2', unit: 'hours', icon: Moon, color: 'text-purple-600', bg: 'bg-purple-100', gradient: 'stat-card-purple' },
+  // Format today's meals for display
+  const mealTypeOrder: Record<string, number> = { breakfast: 0, lunch: 1, dinner: 2, snack: 3 };
+  const sortedMeals = [...dashboardData.meals].sort((a, b) => mealTypeOrder[a.mealType] - mealTypeOrder[b.mealType]);
+
+  const displayMeals = sortedMeals.length > 0 ? sortedMeals.map(meal => ({
+    name: meal.mealType.charAt(0).toUpperCase() + meal.mealType.slice(1),
+    time: new Date(meal.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    calories: meal.calories,
+    items: meal.name,
+  })) : [
+    { name: 'Breakfast', time: '8:30 AM', calories: 0, items: 'Not logged yet' },
+    { name: 'Lunch', time: '12:30 PM', calories: 0, items: 'Not logged yet' },
+    { name: 'Dinner', time: '7:00 PM', calories: 0, items: 'Not logged yet' },
   ];
 
-  const recentMeals = [
-    { name: 'Breakfast', time: '8:30 AM', calories: 450, items: 'Oatmeal with berries', image: 'https://images.unsplash.com/photo-1517673400267-0251440c45dc?w=200&q=80' },
-    { name: 'Lunch', time: '12:30 PM', calories: 650, items: 'Grilled chicken salad', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&q=80' },
-    { name: 'Snack', time: '3:15 PM', calories: 200, items: 'Greek yogurt' },
-    { name: 'Dinner', time: '7:00 PM', calories: 150, items: 'Currently logging...' },
+  const stats = [
+    { label: 'Calories', value: caloriesConsumed.toString(), unit: 'kcal', icon: TrendingUp, color: 'text-primary bg-primary/10', gradient: 'stat-card-green' },
+    { label: 'Water', value: dashboardData.waterIntake.toString(), unit: `/${waterGoal} glasses`, icon: Droplets, color: 'text-blue-600 bg-blue-100', gradient: 'stat-card-blue' },
+    { label: 'Active', value: activeMinutes.toString(), unit: 'min', icon: Activity, color: 'text-warning bg-warning/10', gradient: 'stat-card-orange' },
+    { label: 'Sleep', value: '7.2', unit: 'hours', icon: Moon, color: 'text-purple-600 bg-purple-100', gradient: 'stat-card-purple' },
   ];
 
   const quickActions = [
-    { icon: Plus, label: 'Add Meal', onClick: () => router.push('/meals/add'), color: 'bg-green-100 text-green-600' },
-    { icon: Target, label: 'Update Goals', onClick: () => router.push('/goals'), color: 'bg-blue-100 text-blue-600' },
-    { icon: Trophy, label: 'Achievements', onClick: () => toast.info('Loading achievements...'), color: 'bg-amber-100 text-amber-600' },
-    { icon: Calendar, label: 'Meal Plan', onClick: () => router.push('/meals/plan'), color: 'bg-purple-100 text-purple-600' },
+    { icon: Plus, label: 'Add Meal', onClick: () => router.push('/meals/add'), color: 'bg-primary/10 text-primary' },
+    { icon: Target, label: 'Update Goals', onClick: () => router.push('/goals'), color: 'text-blue-600 bg-blue-100' },
+    { icon: Trophy, label: 'Achievements', onClick: () => router.push('/goals'), color: 'text-warning bg-warning/10' },
+    { icon: Calendar, label: 'Meal Plan', onClick: () => router.push('/meals/plan'), color: 'text-purple-600 bg-purple-100' },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-teal-50 to-amber-50 wellness-scrollbar">
+    <div className="min-h-screen bg-gradient-hero scrollbar-brand">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-lg border-b border-green-100">
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}! 🌱</p>
-              <h1 className="heading-font text-2xl sm:text-3xl font-bold text-gray-800">
+              <p className="text-sm text-muted-foreground">
+                Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}!
+              </p>
+              <h1 className="font-heading text-2xl sm:text-3xl font-bold text-foreground">
                 Your Wellness Dashboard
               </h1>
             </div>
@@ -315,16 +423,19 @@ export default function DashboardPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="wellness-card p-8"
           >
-            <h2 className="heading-font text-xl font-bold text-gray-800 mb-6 text-center">
-              Daily Nutrition
-            </h2>
-            <CalorieRing goal={calorieGoal} consumed={caloriesConsumed} />
-            <div className="mt-6 pt-6 border-t border-green-100 text-center">
-              <p className="text-sm text-gray-500 mb-1">Remaining</p>
-              <p className="text-2xl font-bold text-gradient-vitality">{caloriesRemaining} kcal</p>
-            </div>
+            <BrandCard>
+              <CardHeader>
+                <CardTitle className="text-center">Daily Nutrition</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col items-center">
+                <CalorieRing goal={calorieGoal} consumed={caloriesConsumed} />
+                <div className="mt-6 pt-6 border-t border-border/50 text-center w-full">
+                  <p className="text-sm text-muted-foreground mb-1">Remaining</p>
+                  <p className="text-2xl font-bold text-primary">{caloriesRemaining} kcal</p>
+                </div>
+              </CardContent>
+            </BrandCard>
           </motion.div>
 
           {/* Macros */}
@@ -332,34 +443,37 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="wellness-card p-8"
           >
-            <h2 className="heading-font text-xl font-bold text-gray-800 mb-6">
-              Macros Today
-            </h2>
-            <div className="space-y-6">
-              <MacroBar
-                label="Protein"
-                current={macrosConsumed.protein}
-                goal={macros.protein}
-                color="macro-protein"
-                icon={TrendingUp}
-              />
-              <MacroBar
-                label="Carbs"
-                current={macrosConsumed.carbs}
-                goal={macros.carbs}
-                color="macro-carbs"
-                icon={Apple}
-              />
-              <MacroBar
-                label="Fat"
-                current={macrosConsumed.fat}
-                goal={macros.fat}
-                color="macro-fat"
-                icon={Droplets}
-              />
-            </div>
+            <BrandCard>
+              <CardHeader>
+                <CardTitle>Macros Today</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <MacroBar
+                    label="Protein"
+                    current={macrosConsumed.protein || 0}
+                    goal={macros.protein_target || 0}
+                    color="bg-green-500"
+                    icon={TrendingUp}
+                  />
+                  <MacroBar
+                    label="Carbs"
+                    current={macrosConsumed.carbs || 0}
+                    goal={macros.carb_target || 0}
+                    color="bg-teal-500"
+                    icon={Apple}
+                  />
+                  <MacroBar
+                    label="Fat"
+                    current={macrosConsumed.fat || 0}
+                    goal={macros.fat_target || 0}
+                    color="bg-orange-500"
+                    icon={Droplets}
+                  />
+                </div>
+              </CardContent>
+            </BrandCard>
           </motion.div>
 
           {/* Quick Stats */}
@@ -374,37 +488,135 @@ export default function DashboardPage() {
             ))}
           </motion.div>
 
+          {/* Water & Activity Quick Logger */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+          >
+            <BrandCard>
+              <CardHeader>
+                <CardTitle>Quick Log</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {/* Water Logger */}
+                  <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-2xl border border-blue-200 dark:border-blue-800">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <Droplets className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        <div>
+                          <p className="font-semibold">Water Intake</p>
+                          <p className="text-sm text-muted-foreground">{dashboardData.waterIntake} / {waterGoal} glasses</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-center gap-4">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => updateWaterIntake(-1)}
+                        className="h-10 w-10 rounded-full border-blue-200 hover:bg-blue-100"
+                      >
+                        <Minus className="h-4 w-4" />
+                      </Button>
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: Math.min(waterGoal, 12) }).map((_, i) => (
+                          <motion.span
+                            key={i}
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className={`text-2xl ${i < dashboardData.waterIntake ? '' : 'grayscale opacity-30'}`}
+                          >
+                            💧
+                          </motion.span>
+                        ))}
+                      </div>
+                      <Button
+                        size="icon"
+                        onClick={() => updateWaterIntake(1)}
+                        className="h-10 w-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Activity Logger */}
+                  <div className="p-4 bg-warning/10 dark:bg-warning/20 rounded-2xl border border-warning/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Activity className="w-5 h-5 text-warning" />
+                        <div>
+                          <p className="font-semibold">Activity Today</p>
+                          <p className="text-sm text-muted-foreground">{dashboardData.activeMinutes} minutes logged</p>
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowActivityDialog(true)}
+                        className="text-primary hover:text-primary/80"
+                      >
+                        + Add
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </BrandCard>
+          </motion.div>
+
           {/* Recent Meals */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="wellness-card p-6 lg:col-span-2"
+            className="lg:col-span-2"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="heading-font text-xl font-bold text-gray-800">
-                Today's Meals
-              </h2>
-              <Link
-                href="/meals/add"
-                className="flex items-center gap-2 text-green-600 hover:text-green-700 font-medium text-sm"
-              >
-                Add Meal
-                <Plus className="w-4 h-4" />
-              </Link>
-            </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              {recentMeals.map((meal, index) => (
-                <motion.div
-                  key={meal.name}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4 + index * 0.1 }}
-                >
-                  <MealCard {...meal} />
-                </motion.div>
-              ))}
-            </div>
+            <BrandCard>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Today&apos;s Meals</CardTitle>
+                  <Link
+                    href="/meals"
+                    className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium text-sm"
+                  >
+                    Add Meal
+                    <Plus className="w-4 h-4" />
+                  </Link>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {displayMeals.length > 0 ? (
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {displayMeals.map((meal, index) => (
+                      <motion.div
+                        key={`${meal.name}-${index}`}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.4 + index * 0.1 }}
+                      >
+                        <MealCard {...meal} />
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState
+                    icon={Apple}
+                    title="No meals logged yet today"
+                    description="Start tracking your nutrition by adding your first meal"
+                    action={
+                      <Link href="/meals/add">
+                        <Button variant="brand" size="lg">
+                          Add Your First Meal
+                        </Button>
+                      </Link>
+                    }
+                  />
+                )}
+              </CardContent>
+            </BrandCard>
           </motion.div>
 
           {/* Quick Actions */}
@@ -412,16 +624,103 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="wellness-card p-6"
           >
-            <h2 className="heading-font text-xl font-bold text-gray-800 mb-6">
-              Quick Actions
-            </h2>
-            <div className="grid grid-cols-2 gap-4">
-              {quickActions.map((action, _index) => (
-                <QuickActionButton key={action.label} {...action} />
-              ))}
-            </div>
+            <BrandCard>
+              <CardHeader>
+                <CardTitle>Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TooltipProvider>
+                  <div className="grid grid-cols-2 gap-4">
+                    {quickActions.map((action, _index) => (
+                      <Tooltip key={action.label}>
+                        <TooltipTrigger asChild>
+                          <div>
+                            <QuickActionButton {...action} />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{action.label}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
+                  </div>
+                </TooltipProvider>
+              </CardContent>
+            </BrandCard>
+          </motion.div>
+
+          {/* Activity Dialog */}
+          <Dialog open={showActivityDialog} onOpenChange={setShowActivityDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Log Activity</DialogTitle>
+                <DialogDescription>
+                  Select the duration of your activity or enter a custom amount
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="grid grid-cols-4 gap-2">
+                  {[15, 30, 45, 60].map((mins) => (
+                    <Button
+                      key={mins}
+                      variant="outline"
+                      onClick={() => addActivity(mins)}
+                      className="hover:bg-warning/10"
+                    >
+                      {mins}m
+                    </Button>
+                  ))}
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {[90, 120].map((mins) => (
+                    <Button
+                      key={mins}
+                      variant="outline"
+                      onClick={() => addActivity(mins)}
+                      className="hover:bg-warning/10"
+                    >
+                      {mins}m
+                    </Button>
+                  ))}
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      const mins = prompt('Enter minutes:');
+                      if (mins && !isNaN(parseInt(mins))) addActivity(parseInt(mins));
+                    }}
+                    className="hover:bg-warning/10"
+                  >
+                    Custom
+                  </Button>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="ghost" onClick={() => setShowActivityDialog(false)}>
+                  Cancel
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {/* Second Row - Smart Insights & Daily Tip */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="lg:col-span-2"
+          >
+            <SmartInsights calorieGoal={calorieGoal} userData={profile} />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.55 }}
+          >
+            <DailyTipCard />
           </motion.div>
         </div>
 
@@ -429,8 +728,8 @@ export default function DashboardPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="mt-8 rounded-3xl bg-gradient-to-r from-green-500 to-teal-500 p-8 text-white relative overflow-hidden"
+          transition={{ delay: 0.6 }}
+          className="rounded-3xl bg-gradient-to-r from-primary to-secondary p-8 text-white relative overflow-hidden shadow-brand"
         >
           <div className="absolute inset-0 opacity-10">
             <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -443,17 +742,17 @@ export default function DashboardPage() {
                 <Sparkles className="w-8 h-8" />
               </div>
               <div>
-                <h3 className="heading-font text-2xl font-bold mb-1">
-                  You're doing great! 🎉
+                <h3 className="font-heading text-2xl font-bold mb-1">
+                  You&apos;re doing great!
                 </h3>
-                <p className="text-green-100">
-                  You've logged meals for 14 days straight. Keep it up!
+                <p className="text-white/90">
+                  You&apos;ve logged meals for 14 days straight. Keep it up!
                 </p>
               </div>
             </div>
             <Link
               href="/analytics"
-              className="flex items-center gap-2 px-6 py-3 rounded-full bg-white text-green-600 font-semibold hover:bg-green-50 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-primary font-semibold hover:bg-gray-50 transition-all"
             >
               View Progress
               <ChevronRight className="w-5 h-5" />

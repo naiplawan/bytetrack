@@ -42,6 +42,14 @@ const buttonVariants = cva(
         // Glass Effect
         glass:
           'bg-white/10 backdrop-blur-xl border border-white/20 text-foreground hover:bg-white/20 rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98]',
+
+        // ByteTrack Brand
+        brand:
+          'bg-gradient-to-r from-brand to-brandLight text-white rounded-full shadow-brand hover:shadow-brand-hover hover:scale-[1.02] active:scale-[0.98]',
+
+        // ByteTrack Secondary (outline)
+        'brand-outline':
+          'border-2 border-brand/10 text-brand hover:bg-brand/10 hover:border-brand/20 rounded-full transition-all hover:scale-[1.02] active:scale-[0.98]',
       },
       size: {
         sm: 'h-9 px-3 text-sm rounded-lg',

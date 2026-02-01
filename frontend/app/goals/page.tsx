@@ -1,10 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Target, Trophy, Sparkles, Check, Flame, Star } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, Target, Trophy, Sparkles, Check, Flame, Star, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import {
+  getAllAchievements,
+  getAchievementCount,
+  getNextAchievements,
+  trackEvent,
+  getDashboardAchievements,
+} from '@/lib/achievements-service';
 
 function GoalSlider({
   label,
@@ -73,52 +80,93 @@ function AchievementCard({
   title,
   description,
   unlocked,
-  progress
+  progress,
+  maxProgress,
+  rarity
 }: {
   icon: string;
   title: string;
   description: string;
   unlocked: boolean;
-  progress?: number;
+  progress: number;
+  maxProgress: number;
+  rarity: string;
 }) {
+  const progressPercent = Math.min((progress / maxProgress) * 100, 100);
+
+  const getRarityColor = () => {
+    switch (rarity) {
+      case 'legendary': return 'from-amber-400 to-orange-500';
+      case 'epic': return 'from-purple-400 to-pink-500';
+      case 'rare': return 'from-blue-400 to-cyan-500';
+      default: return 'from-gray-400 to-gray-500';
+    }
+  };
+
+  const getRarityBorder = () => {
+    switch (rarity) {
+      case 'legendary': return 'border-amber-300';
+      case 'epic': return 'border-purple-300';
+      case 'rare': return 'border-blue-300';
+      default: return 'border-gray-300';
+    }
+  };
+
   return (
     <motion.div
       whileHover={unlocked ? { scale: 1.02 } : {}}
       className={`relative overflow-hidden rounded-3xl p-6 border-2 transition-all ${
         unlocked
-          ? 'bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-200'
-          : 'bg-gray-50 border-gray-200 opacity-60'
+          ? `bg-gradient-to-br ${getRarityColor()} bg-opacity-10 ${getRarityBorder()}`
+          : 'bg-gray-50 border-gray-200 opacity-70'
       }`}
     >
-      {unlocked && (
+      {unlocked ? (
         <div className="absolute top-4 right-4">
           <Check className="w-6 h-6 text-amber-600" />
+        </div>
+      ) : (
+        <div className="absolute top-4 right-4">
+          <Lock className="w-5 h-5 text-gray-400" />
         </div>
       )}
 
       <div className="flex items-start gap-4">
         <div
-          className={`text-5xl ${unlocked ? '' : 'grayscale opacity-30'}`}
+          className={`text-5xl ${unlocked ? '' : 'grayscale opacity-40'}`}
         >
           {icon}
         </div>
         <div className="flex-1">
-          <h3 className={`font-bold text-lg mb-1 ${unlocked ? 'text-gray-800' : 'text-gray-500'}`}>
-            {title}
-          </h3>
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className={`font-bold text-lg ${unlocked ? 'text-gray-800' : 'text-gray-500'}`}>
+              {title}
+            </h3>
+            {!unlocked && rarity !== 'common' && (
+              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                rarity === 'legendary' ? 'bg-amber-100 text-amber-700' :
+                rarity === 'epic' ? 'bg-purple-100 text-purple-700' :
+                'bg-blue-100 text-blue-700'
+              }`}>
+                {rarity}
+              </span>
+            )}
+          </div>
           <p className={`text-sm ${unlocked ? 'text-gray-600' : 'text-gray-400'}`}>
             {description}
           </p>
-          {progress !== undefined && !unlocked && (
+          {!unlocked && maxProgress > 1 && (
             <div className="mt-3">
               <div className="flex justify-between text-xs mb-1">
                 <span className="text-gray-500">Progress</span>
-                <span className="font-medium text-gray-700">{progress}%</span>
+                <span className="font-medium text-gray-700">{progress}/{maxProgress}</span>
               </div>
               <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-amber-400 rounded-full transition-all duration-500"
-                  style={{ width: `${progress}%` }}
+                <motion.div
+                  className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progressPercent}%` }}
+                  transition={{ duration: 0.5 }}
                 />
               </div>
             </div>
@@ -180,6 +228,8 @@ function MilestoneCard({
 export default function GoalsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [achievements, setAchievements] = useState<any[]>([]);
+  const [achievementStats, setAchievementStats] = useState<any>(null);
 
   // Goal states
   const [calorieGoal, setCalorieGoal] = useState(2000);
@@ -188,56 +238,43 @@ export default function GoalsPage() {
   const [fatGoal, setFatGoal] = useState(55);
   const [waterGoal, setWaterGoal] = useState(8);
 
-  const achievements = [
-    {
-      icon: '🏆',
-      title: 'First Week',
-      description: 'Log meals for 7 consecutive days',
-      unlocked: true,
-    },
-    {
-      icon: '🔥',
-      title: 'Streak Master',
-      description: 'Maintain a 14-day logging streak',
-      unlocked: true,
-    },
-    {
-      icon: '💪',
-      title: 'Protein Pro',
-      description: 'Hit your protein goal 30 days in a month',
-      unlocked: false,
-      progress: 73,
-    },
-    {
-      icon: '🎯',
-      title: 'Calorie King',
-      description: 'Stay within calorie goals for a full week',
-      unlocked: true,
-    },
-    {
-      icon: '💧',
-      title: 'Hydration Hero',
-      description: 'Hit water goal 7 days straight',
-      unlocked: false,
-      progress: 57,
-    },
-    {
-      icon: '⭐',
-      title: 'Month Master',
-      description: 'Complete a full month of logging',
-      unlocked: false,
-      progress: 45,
-    },
-  ];
+  // Load data on mount
+  useEffect(() => {
+    loadData();
+    // Check for new achievements on page load
+    trackEvent({ type: 'meal_logged' });
+  }, []);
 
-  const milestones = [
-    { title: 'Weight Goal', target: 68, current: 69.6, unit: 'kg', color: 'bg-gradient-to-r from-green-500 to-green-400' },
-    { title: 'Monthly Streak', target: 30, current: 14, unit: 'days', color: 'bg-gradient-to-r from-orange-500 to-amber-400' },
-    { title: 'Total Logged', target: 100, current: 67, unit: 'meals', color: 'bg-gradient-to-r from-blue-500 to-cyan-400' },
-  ];
+  const loadData = async () => {
+    try {
+      // Load user data for goals
+      const stored = localStorage.getItem('userData');
+      if (stored) {
+        const data = JSON.parse(stored);
+        if (data.targetCalories) setCalorieGoal(data.targetCalories);
+        if (data.macroTargets) {
+          if (data.macroTargets.protein) setProteinGoal(data.macroTargets.protein);
+          if (data.macroTargets.carbs) setCarbsGoal(data.macroTargets.carbs);
+          if (data.macroTargets.fat) setFatGoal(data.macroTargets.fat);
+        }
+        if (data.waterTarget) setWaterGoal(data.waterTarget);
+      }
+
+      // Load achievements
+      const allAchievements = await getAllAchievements();
+      const stats = await getAchievementCount();
+
+      setAchievements(allAchievements);
+      setAchievementStats(stats);
+    } catch (error) {
+      console.error('Error loading goals:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadData = () => {
+    const loadData = async () => {
       try {
         const stored = localStorage.getItem('userData');
         if (stored) {
@@ -417,18 +454,52 @@ export default function GoalsPage() {
 
         {/* Milestones Section */}
         <section>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center">
-              <Trophy className="w-6 h-6 text-amber-600" />
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center">
+                <Trophy className="w-6 h-6 text-amber-600" />
+              </div>
+              <div>
+                <h2 className="heading-font text-2xl font-bold">Your Milestones</h2>
+                <p className="text-sm text-gray-500">Track your progress</p>
+              </div>
             </div>
-            <div>
-              <h2 className="heading-font text-2xl font-bold">Your Milestones</h2>
-              <p className="text-sm text-gray-500">Track your progress</p>
-            </div>
+            {achievementStats && (
+              <div className="text-right">
+                <p className="text-2xl font-bold text-brand">{achievementStats.totalUnlocked}</p>
+                <p className="text-sm text-gray-500">of {achievementStats.totalAchievements} unlocked</p>
+              </div>
+            )}
           </div>
 
+          {/* Real milestones from achievement progress */}
           <div className="grid md:grid-cols-3 gap-4">
-            {milestones.map((milestone, index) => (
+            {[
+              {
+                title: 'Current Streak',
+                target: 30,
+                current: achievements.find(a => a.id === 'streak_30')?.progress || 0,
+                unit: 'days',
+                color: 'bg-gradient-to-r from-orange-500 to-amber-400',
+                icon: '🔥',
+              },
+              {
+                title: 'Meals Logged',
+                target: 100,
+                current: achievements.find(a => a.id === 'meals_100')?.progress || 0,
+                unit: 'meals',
+                color: 'bg-gradient-to-r from-blue-500 to-cyan-400',
+                icon: '📝',
+              },
+              {
+                title: 'Goals Hit',
+                target: 30,
+                current: achievements.find(a => a.id === 'goal_hit_30')?.progress || 0,
+                unit: 'days',
+                color: 'bg-gradient-to-r from-green-500 to-teal-400',
+                icon: '🎯',
+              },
+            ].map((milestone, index) => (
               <motion.div
                 key={milestone.title}
                 initial={{ opacity: 0, y: 20 }}
@@ -443,28 +514,44 @@ export default function GoalsPage() {
 
         {/* Achievements Section */}
         <section>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-purple-100 flex items-center justify-center">
-              <Star className="w-6 h-6 text-purple-600" />
-            </div>
-            <div>
-              <h2 className="heading-font text-2xl font-bold">Achievements</h2>
-              <p className="text-sm text-gray-500">Unlock badges as you progress</p>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-purple-100 flex items-center justify-center">
+                <Star className="w-6 h-6 text-purple-600" />
+              </div>
+              <div>
+                <h2 className="heading-font text-2xl font-bold">Achievements</h2>
+                <p className="text-sm text-gray-500">Unlock badges as you progress</p>
+              </div>
             </div>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            {achievements.map((achievement, index) => (
+          {/* Sort achievements: unlocked first, then by progress */}
+          {[...achievements]
+            .sort((a, b) => {
+              if (a.unlocked !== b.unlocked) return a.unlocked ? -1 : 1;
+              return b.progress - a.progress;
+            })
+            .slice(0, 6) // Show top 6
+            .map((achievement, index) => (
               <motion.div
-                key={achievement.title}
+                key={achievement.id}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: index * 0.05 }}
+                className="sm:col-span-2 grid sm:grid-cols-2"
               >
-                <AchievementCard {...achievement} />
+                <AchievementCard
+                  icon={achievement.icon}
+                  title={achievement.name}
+                  description={achievement.description}
+                  unlocked={achievement.unlocked}
+                  progress={achievement.progress}
+                  maxProgress={achievement.maxProgress}
+                  rarity={achievement.rarity}
+                />
               </motion.div>
             ))}
-          </div>
         </section>
 
         {/* Motivational Banner */}

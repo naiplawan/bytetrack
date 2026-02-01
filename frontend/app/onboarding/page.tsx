@@ -1,10 +1,41 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronLeft, Check, User, Ruler, Activity, Target, Sparkles, Heart } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ChevronRight, ChevronLeft, Check, User, Ruler, Activity, Target, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
+import Image from 'next/image';
+import {
+  calculateBMR,
+  calculateTDEE,
+  calculateTargetCalories,
+  calculateMacroTargets,
+  calculateWaterIntake,
+  type Gender,
+} from '@/lib/calorie-calculator';
+import { getProfileAction, completeOnboardingAction, getOnboardingStatusAction } from '@/lib/actions/profile-actions';
+import { saveStep2Data } from '@/lib/actions/onboarding-actions';
+import { saveStep3Data } from '@/lib/actions/step3-actions';
+import { saveStep4Data } from '@/lib/actions/step4-actions';
+import { saveStep5Data } from '@/lib/actions/step5-actions';
+import { cacheOnboardingData, getAllCachedData } from '@/lib/actions/onboarding-utils';
+
+interface OnboardingData {
+  name?: string;
+  email?: string;
+  age?: number;
+  gender?: Gender;
+  height?: number;
+  weight?: number;
+  target_weight?: number;
+  activity_level?: 'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active' | 'extra_active';
+  goal?: 'lose_weight' | 'maintain_weight' | 'gain_weight';
+}
+
+interface FormErrors {
+  [key: string]: string;
+}
 
 const steps = [
   {
@@ -40,370 +71,493 @@ const steps = [
     title: 'Your Wellness Goals',
     description: 'What do you want to achieve?',
     icon: Target,
-    image: 'https://images.unsplash.com/photo-1526628953301-3e58db880229?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80',
   },
-];
-
-const activityLevels = [
-  { id: 'sedentary', label: 'Sedentary', description: 'Little to no exercise', emoji: '🛋️' },
-  { id: 'light', label: 'Lightly Active', description: 'Exercise 1-3 days/week', emoji: '🚶' },
-  { id: 'moderate', label: 'Moderately Active', description: 'Exercise 3-5 days/week', emoji: '🏃' },
-  { id: 'active', label: 'Very Active', description: 'Exercise 6-7 days/week', emoji: '💪' },
-  { id: 'extra', label: 'Extra Active', description: 'Very hard exercise/sports', emoji: '🏋️' },
-];
-
-const goals = [
-  { id: 'lose', label: 'Lose Weight', emoji: '📉', color: 'from-blue-400 to-cyan-400' },
-  { id: 'maintain', label: 'Maintain Weight', emoji: '⚖️', color: 'from-green-400 to-teal-400' },
-  { id: 'gain', label: 'Gain Muscle', emoji: '💪', color: 'from-orange-400 to-red-400' },
-  { id: 'health', label: 'Eat Healthier', emoji: '🥗', color: 'from-purple-400 to-pink-400' },
-  { id: 'energy', label: 'More Energy', emoji: '⚡', color: 'from-yellow-400 to-amber-400' },
 ];
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState({
-    name: '',
-    age: '',
-    gender: '',
-    weight: '',
-    height: '',
-    activityLevel: '',
-    goals: [] as string[],
-  });
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [completed, setCompleted] = useState(false);
+  const [onboardingData, setOnboardingData] = useState<OnboardingData>({});
+  const [errors, setErrors] = useState<FormErrors>({});
 
-  const progress = ((currentStep + 1) / steps.length) * 100;
+  // Check onboarding status on mount
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const status = await getOnboardingStatusAction();
+        if (status.completed) {
+          router.push('/dashboard');
+        }
+      } catch (error) {
+        console.error('Error checking onboarding status:', error);
+      }
+    };
+    checkStatus();
+  }, [router]);
 
-  const handleNext = () => {
-    if (currentStep === 1 && (!formData.name || !formData.age)) {
-      toast.error('Please fill in all required fields');
-      return;
+  const updateOnboardingData = (step: number, data: Partial<OnboardingData>) => {
+    setOnboardingData(prev => ({ ...prev, ...data }));
+  };
+
+  const handleNext = async () => {
+    // For step 1, just go to next step
+    if (currentStep === 1) {
+      setCurrentStep(prev => prev + 1);
     }
-    if (currentStep === 2 && (!formData.weight || !formData.height)) {
-      toast.error('Please fill in all required fields');
-      return;
-    }
-    if (currentStep === 3 && !formData.activityLevel) {
-      toast.error('Please select your activity level');
-      return;
-    }
-    if (currentStep === 4 && formData.goals.length === 0) {
-      toast.error('Please select at least one goal');
-      return;
-    }
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      // Complete onboarding
-      const userData = {
-        name: formData.name,
-        age: formData.age,
-        gender: formData.gender,
-        currentWeight: formData.weight,
-        height: formData.height,
-        activityLevel: formData.activityLevel,
-        goals: formData.goals,
-        targetCalories: 2000,
-        macroTargets: { protein: 120, carbs: 200, fat: 55 },
-      };
-      localStorage.setItem('userData', JSON.stringify(userData));
-      localStorage.setItem('onboardingComplete', 'true');
-      toast.success('Welcome to your wellness journey! 🌱');
-      router.push('/dashboard');
+    // For steps 2-4, they will handle navigation via form submission
+    // For step 5, it's handled by the form submit
+  };
+
+  const handlePrevious = () => {
+    if (currentStep > 1) {
+      setCurrentStep(prev => prev - 1);
     }
   };
 
-  const handleGoalToggle = (goalId: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      goals: prev.goals.includes(goalId)
-        ? prev.goals.filter((g) => g !== goalId)
-        : [...prev.goals, goalId],
-    }));
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-teal-50 to-amber-50 relative overflow-hidden">
-      {/* Decorative Background Elements */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 right-20 w-64 h-64 bg-green-200/30 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-20 left-20 w-48 h-48 bg-teal-200/30 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-amber-200/30 rounded-full blur-2xl animate-float" style={{ animationDelay: '2s' }} />
+  const Step1Content = () => (
+    <div className="text-center space-y-6">
+      <div className="w-24 h-24 mx-auto rounded-full bg-gradient-brand flex items-center justify-center">
+        <Sparkles className="w-12 h-12 text-white" />
       </div>
+      <h2 className="font-heading text-3xl font-bold text-text-primary">
+        {steps[0].title}
+      </h2>
+      <p className="text-xl text-text-secondary max-w-2xl mx-auto">
+        {steps[0].description}
+      </p>
+    </div>
+  );
 
-      {/* Progress Bar */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-green-100">
-        <div className="max-w-3xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-600">Step {currentStep + 1} of {steps.length}</span>
-            <span className="text-sm font-bold text-primary">{Math.round(progress)}%</span>
-          </div>
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-green-500 to-teal-500 rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.5 }}
-            />
-          </div>
+  const Step2Content = () => (
+    <form id="step-2" className="space-y-6" action={async (formData: FormData) => {
+      setIsSubmitting(true);
+      try {
+        const data = {
+          name: formData.get('name') as string,
+          email: formData.get('email') as string,
+          age: parseInt(formData.get('age') as string),
+          gender: formData.get('gender') as 'male' | 'female' | 'other',
+        };
+
+        await saveStep2Data(data);
+        await cacheOnboardingData(2, data);
+        updateOnboardingData(2, data);
+        setCurrentStep(3);
+      } catch (error: any) {
+        console.error('Step 2 submission error:', error);
+        toast.error(error.message || 'Please check your inputs and try again.');
+      } finally {
+        setIsSubmitting(false);
+      }
+    }}>
+      <div className="w-24 h-24 rounded-full bg-brand/10 flex items-center justify-center">
+        <User className="w-12 h-12 text-brand" />
+      </div>
+      <h2 className="font-heading text-3xl font-bold text-text-primary">
+        {steps[1].title}
+      </h2>
+      <p className="text-xl text-text-secondary">
+        {steps[1].description}
+      </p>
+      <div className="space-y-4 max-w-md mx-auto">
+        <div>
+          <label className="block text-sm font-medium text-text-primary mb-2">Name</label>
+          <input
+            type="text"
+            name="name"
+            defaultValue={onboardingData.name || ''}
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand focus:border-transparent"
+            placeholder="Enter your name"
+            required
+          />
+          {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text-primary mb-2">Email</label>
+          <input
+            type="email"
+            name="email"
+            defaultValue={onboardingData.email || ''}
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand focus:border-transparent"
+            placeholder="Enter your email"
+            required
+          />
+          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text-primary mb-2">Age</label>
+          <input
+            type="number"
+            name="age"
+            defaultValue={onboardingData.age || ''}
+            min="1"
+            max="120"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand focus:border-transparent"
+            placeholder="Enter your age"
+            required
+          />
+          {errors.age && <p className="text-red-500 text-sm mt-1">{errors.age}</p>}
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text-primary mb-2">Gender</label>
+          <select
+            name="gender"
+            defaultValue={onboardingData.gender || ''}
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand focus:border-transparent"
+            required
+          >
+            <option value="">Select gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+          {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender}</p>}
         </div>
       </div>
+    </form>
+  );
 
-      {/* Main Content */}
-      <div className="min-h-screen flex items-center justify-center px-4 py-20">
-        <div className="max-w-3xl w-full">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentStep}
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.3 }}
-            >
-              {/* Welcome Step */}
-              {currentStep === 0 && (
-                <div className="text-center space-y-8">
-                  <div className="relative">
-                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-green-400 to-teal-400 flex items-center justify-center mx-auto mb-6">
-                      <Sparkles className="w-16 h-16 text-white" />
-                    </div>
-                    <div className="absolute -top-2 -right-2 text-6xl animate-float">✨</div>
-                  </div>
-                  <h1 className="heading-font text-4xl sm:text-5xl font-bold text-gray-800">
-                    Welcome to Your
-                    <span className="text-gradient-vitality"> Wellness Journey!</span>
-                  </h1>
-                  <p className="text-xl text-gray-600 max-w-xl mx-auto">
-                    We're excited to help you achieve your health and nutrition goals.
-                    Let's personalize your experience in just a few quick steps.
-                  </p>
-                  <img
-                    src={steps[0].image}
-                    alt="Wellness journey"
-                    className="w-full max-w-md mx-auto rounded-3xl shadow-2xl"
-                  />
-                </div>
-              )}
+  const Step3Content = () => (
+    <form id="step-3" className="space-y-6" action={async (formData: FormData) => {
+      setIsSubmitting(true);
+      try {
+        const data = {
+          height: parseInt(formData.get('height') as string),
+          weight: parseInt(formData.get('weight') as string),
+          target_weight: formData.get('target_weight') ? parseInt(formData.get('target_weight') as string) : undefined,
+        };
 
-              {/* Basic Info Step */}
-              {currentStep === 1 && (
-                <div className="wellness-card p-8">
-                  <div className="text-center mb-8">
-                    <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-                      <User className="w-10 h-10 text-green-600" />
-                    </div>
-                    <h2 className="heading-font text-3xl font-bold text-gray-800 mb-2">
-                      {steps[1].title}
-                    </h2>
-                    <p className="text-gray-600">{steps[1].description}</p>
-                  </div>
+        await saveStep3Data(data);
+        await cacheOnboardingData(3, data);
+        updateOnboardingData(3, data);
+        setCurrentStep(4);
+      } catch (error: any) {
+        console.error('Step 3 submission error:', error);
+        toast.error(error.message || 'Please check your inputs and try again.');
+      } finally {
+        setIsSubmitting(false);
+      }
+    }}>
+      <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center">
+        <Ruler className="w-12 h-12 text-blue-600" />
+      </div>
+      <h2 className="font-heading text-3xl font-bold text-text-primary">
+        {steps[2].title}
+      </h2>
+      <p className="text-xl text-text-secondary">
+        {steps[2].description}
+      </p>
+      <div className="space-y-4 max-w-md mx-auto">
+        <div>
+          <label className="block text-sm font-medium text-text-primary mb-2">Height (cm)</label>
+          <input
+            type="number"
+            name="height"
+            defaultValue={onboardingData.height || ''}
+            min="50"
+            max="300"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand focus:border-transparent"
+            placeholder="Enter your height"
+            required
+          />
+          {errors.height && <p className="text-red-500 text-sm mt-1">{errors.height}</p>}
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text-primary mb-2">Current Weight (kg)</label>
+          <input
+            type="number"
+            name="weight"
+            defaultValue={onboardingData.weight || ''}
+            min="20"
+            max="300"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand focus:border-transparent"
+            placeholder="Enter your current weight"
+            required
+          />
+          {errors.weight && <p className="text-red-500 text-sm mt-1">{errors.weight}</p>}
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text-primary mb-2">Target Weight (kg) - Optional</label>
+          <input
+            type="number"
+            name="target_weight"
+            defaultValue={onboardingData.target_weight || ''}
+            min="20"
+            max="300"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand focus:border-transparent"
+            placeholder="Enter your target weight"
+          />
+          {errors.target_weight && <p className="text-red-500 text-sm mt-1">{errors.target_weight}</p>}
+        </div>
+      </div>
+    </form>
+  );
 
-                  <div className="space-y-6">
-                    <div>
-                      <label className="text-sm font-medium text-gray-700 mb-2 block">Your Name *</label>
-                      <input
-                        type="text"
-                        placeholder="Enter your name"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="wellness-input"
-                      />
-                    </div>
+  const Step4Content = () => (
+    <form id="step-4" className="space-y-6" action={async (formData: FormData) => {
+      setIsSubmitting(true);
+      try {
+        const data = {
+          activity_level: formData.get('activity_level') as any,
+        };
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm font-medium text-gray-700 mb-2 block">Age *</label>
-                        <input
-                          type="number"
-                          placeholder="25"
-                          value={formData.age}
-                          onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                          className="wellness-input"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700 mb-2 block">Gender</label>
-                        <select
-                          value={formData.gender}
-                          onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                          className="wellness-input"
-                        >
-                          <option value="">Select</option>
-                          <option value="male">Male</option>
-                          <option value="female">Female</option>
-                          <option value="other">Other</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+        await saveStep4Data(data);
+        await cacheOnboardingData(4, data);
+        updateOnboardingData(4, data);
+        setCurrentStep(5);
+      } catch (error: any) {
+        console.error('Step 4 submission error:', error);
+        toast.error(error.message || 'Please select an activity level and try again.');
+      } finally {
+        setIsSubmitting(false);
+      }
+    }}>
+      <div className="w-24 h-24 rounded-full bg-warning/10 flex items-center justify-center">
+        <Activity className="w-12 h-12 text-warning" />
+      </div>
+      <h2 className="font-heading text-3xl font-bold text-text-primary">
+        {steps[3].title}
+      </h2>
+      <p className="text-xl text-text-secondary">
+        {steps[3].description}
+      </p>
+      <div className="space-y-4 max-w-md mx-auto">
+        <div>
+          <label className="block text-sm font-medium text-text-primary mb-2">Activity Level</label>
+          <select
+            name="activity_level"
+            defaultValue={onboardingData.activity_level || ''}
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand focus:border-transparent"
+            required
+          >
+            <option value="">Select your activity level</option>
+            <option value="sedentary">Sedentary (little or no exercise)</option>
+            <option value="lightly_active">Lightly active (1-3 days/week)</option>
+            <option value="moderately_active">Moderately active (3-5 days/week)</option>
+            <option value="very_active">Very active (6-7 days/week)</option>
+            <option value="extra_active">Extra active (physical job)</option>
+          </select>
+          {errors.activity_level && <p className="text-red-500 text-sm mt-1">{errors.activity_level}</p>}
+        </div>
+      </div>
+    </form>
+  );
 
-              {/* Body Stats Step */}
-              {currentStep === 2 && (
-                <div className="wellness-card p-8">
-                  <div className="text-center mb-8">
-                    <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
-                      <Ruler className="w-10 h-10 text-blue-600" />
-                    </div>
-                    <h2 className="heading-font text-3xl font-bold text-gray-800 mb-2">
-                      {steps[2].title}
-                    </h2>
-                    <p className="text-gray-600">{steps[2].description}</p>
-                  </div>
+  const Step5Content = () => (
+    <form id="step-5" className="space-y-6" action={async (formData: FormData) => {
+      setIsSubmitting(true);
+      try {
+        const goal = formData.get('goal') as 'lose_weight' | 'maintain_weight' | 'gain_weight';
 
-                  <div className="space-y-6">
-                    <div className="grid grid-cols-2 gap-6">
-                      <div>
-                        <label className="text-sm font-medium text-gray-700 mb-2 block">Current Weight (kg) *</label>
-                        <input
-                          type="number"
-                          placeholder="70"
-                          value={formData.weight}
-                          onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                          className="wellness-input"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700 mb-2 block">Height (cm) *</label>
-                        <input
-                          type="number"
-                          placeholder="170"
-                          value={formData.height}
-                          onChange={(e) => setFormData({ ...formData, height: e.target.value })}
-                          className="wellness-input"
-                        />
-                      </div>
-                    </div>
+        // Get all cached data
+        const allData = await getAllCachedData();
 
-                    <div className="p-6 bg-blue-50 rounded-2xl border border-blue-100">
-                      <p className="text-sm text-blue-800">
-                        💡 This information helps us calculate your daily calorie needs and track your progress over time.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
+        await saveStep5Data(goal, allData);
+        setCompleted(true);
+        toast.success('Welcome to ByteTrack! Your profile has been created.');
 
-              {/* Activity Level Step */}
-              {currentStep === 3 && (
-                <div className="wellness-card p-8">
-                  <div className="text-center mb-8">
-                    <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-4">
-                      <Activity className="w-10 h-10 text-orange-600" />
-                    </div>
-                    <h2 className="heading-font text-3xl font-bold text-gray-800 mb-2">
-                      {steps[3].title}
-                    </h2>
-                    <p className="text-gray-600">{steps[3].description}</p>
-                  </div>
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 1500);
+      } catch (error: any) {
+        console.error('Step 5 submission error:', error);
+        toast.error(error.message || 'Please select a goal and try again.');
+      } finally {
+        setIsSubmitting(false);
+      }
+    }}>
+      <div className="w-24 h-24 rounded-full bg-cta/10 flex items-center justify-center">
+        <Target className="w-12 h-12 text-cta" />
+      </div>
+      <h2 className="font-heading text-3xl font-bold text-text-primary">
+        {steps[4].title}
+      </h2>
+      <p className="text-xl text-text-secondary">
+        {steps[4].description}
+      </p>
+      <div className="space-y-4 max-w-md mx-auto">
+        <div>
+          <label className="block text-sm font-medium text-text-primary mb-2">Your Goal</label>
+          <select
+            name="goal"
+            defaultValue={onboardingData.goal || ''}
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand focus:border-transparent"
+            required
+          >
+            <option value="">Select your goal</option>
+            <option value="lose_weight">Lose weight</option>
+            <option value="maintain_weight">Maintain weight</option>
+            <option value="gain_weight">Gain weight</option>
+          </select>
+          {errors.goal && <p className="text-red-500 text-sm mt-1">{errors.goal}</p>}
+        </div>
+      </div>
+    </form>
+  );
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {activityLevels.map((level) => (
-                      <motion.button
-                        key={level.id}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => setFormData({ ...formData, activityLevel: level.id })}
-                        className={`p-6 rounded-2xl border-2 transition-all text-left ${
-                          formData.activityLevel === level.id
-                            ? 'border-orange-400 bg-orange-50'
-                            : 'border-gray-200 bg-white hover:border-orange-200'
-                        }`}
-                      >
-                        <div className="flex items-center gap-4">
-                          <span className="text-4xl">{level.emoji}</span>
-                          <div>
-                            <p className="font-semibold text-gray-800">{level.label}</p>
-                            <p className="text-sm text-gray-500">{level.description}</p>
-                          </div>
-                          {formData.activityLevel === level.id && (
-                            <Check className="w-6 h-6 text-orange-600 ml-auto" />
-                          )}
-                        </div>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-              )}
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return <Step1Content />;
+      case 2:
+        return <Step2Content />;
+      case 3:
+        return <Step3Content />;
+      case 4:
+        return <Step4Content />;
+      case 5:
+        return <Step5Content />;
+      default:
+        return null;
+    }
+  };
 
-              {/* Goals Step */}
-              {currentStep === 4 && (
-                <div className="wellness-card p-8">
-                  <div className="text-center mb-8">
-                    <div className="w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-4">
-                      <Target className="w-10 h-10 text-purple-600" />
-                    </div>
-                    <h2 className="heading-font text-3xl font-bold text-gray-800 mb-2">
-                      {steps[4].title}
-                    </h2>
-                    <p className="text-gray-600">{steps[4].description}</p>
-                  </div>
+  if (completed) {
+    return (
+      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
+        <div className="text-center space-y-6">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 200 }}
+            className="w-24 h-24 mx-auto rounded-full bg-gradient-brand flex items-center justify-center"
+          >
+            <Check className="w-12 h-12 text-white" />
+          </motion.div>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="font-heading text-3xl font-bold text-text-primary"
+          >
+            Getting you ready...
+          </motion.h2>
+        </div>
+      </div>
+    );
+  }
 
-                  <p className="text-center text-gray-600 mb-6">Select all that apply to you</p>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {goals.map((goal) => (
-                      <motion.button
-                        key={goal.id}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => handleGoalToggle(goal.id)}
-                        className={`p-6 rounded-2xl border-2 transition-all ${
-                          formData.goals.includes(goal.id)
-                            ? 'border-purple-400 bg-purple-50'
-                            : 'border-gray-200 bg-white hover:border-purple-200'
-                        }`}
-                      >
-                        <div className="flex flex-col items-center gap-3">
-                          <span className="text-4xl">{goal.emoji}</span>
-                          <p className="font-semibold text-gray-800 text-center">{goal.label}</p>
-                          {formData.goals.includes(goal.id) && (
-                            <Check className="w-6 h-6 text-purple-600" />
-                          )}
-                        </div>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Navigation Buttons */}
-              <div className="flex items-center justify-between mt-8">
-                {currentStep > 0 && (
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setCurrentStep(currentStep - 1)}
-                    className="flex items-center gap-2 px-6 py-3 rounded-full bg-white border-2 border-green-200 text-green-700 font-semibold hover:bg-green-50 transition-all"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                    Back
-                  </motion.button>
-                )}
-                <div className="flex-1" />
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleNext}
-                  className="btn-vitality flex items-center gap-2"
+  return (
+    <div className="min-h-screen bg-gradient-hero">
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        {/* Progress Bar */}
+        <div className="mb-12">
+          <div className="flex items-center justify-between mb-4">
+            {steps.map((step) => (
+              <div key={step.id} className="flex items-center">
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
+                    currentStep >= step.id
+                      ? 'bg-brand text-white'
+                      : 'bg-gray-200 text-gray-600'
+                  }`}
                 >
-                  {currentStep === steps.length - 1 ? (
-                    <>
-                      Start Journey
-                      <Heart className="w-5 h-5" />
-                    </>
+                  {currentStep > step.id ? (
+                    <Check className="w-5 h-5" />
                   ) : (
-                    <>
-                      Continue
-                      <ChevronRight className="w-5 h-5" />
-                    </>
+                    step.id
                   )}
-                </motion.button>
+                </div>
+                {step.id < steps.length && (
+                  <div
+                    className={`w-16 h-1 mx-2 ${
+                      currentStep > step.id ? 'bg-brand' : 'bg-gray-200'
+                    }`}
+                  />
+                )}
               </div>
-            </motion.div>
-          </AnimatePresence>
+            ))}
+          </div>
+        </div>
+
+        {/* Step Content */}
+        <div className="bg-white rounded-3xl shadow-xl p-8 lg:p-12">
+          <motion.div
+            key={currentStep}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="min-h-[400px] flex flex-col items-center justify-center"
+          >
+            {renderStepContent()}
+          </motion.div>
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between mt-12">
+            {currentStep > 1 && currentStep < 5 ? (
+              // For steps 2-4, show a regular button that goes back
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handlePrevious}
+                disabled={isSubmitting}
+                className={`px-6 py-3 rounded-xl font-medium ${
+                  isSubmitting
+                    ? 'text-gray-400 cursor-not-allowed'
+                    : 'text-brand hover:bg-brand/10'
+                }`}
+              >
+                <ChevronLeft className="w-5 h-5 mr-2 inline" />
+                Previous
+              </motion.button>
+            ) : (
+              // For step 1 and step 5 (form), no previous button needed
+              <div></div>
+            )}
+
+            {currentStep === 1 ? (
+              // Step 1 has a regular Next button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleNext}
+                className="btn-brand text-lg px-8 py-3"
+              >
+                Next
+                <ChevronRight className="w-5 h-5 ml-2 inline" />
+              </motion.button>
+            ) : currentStep < 5 ? (
+              // Steps 2-4 have Next buttons that advance the step
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                form={`step-${currentStep}`}
+                disabled={isSubmitting}
+                className="btn-brand text-lg px-8 py-3"
+              >
+                Next
+                <ChevronRight className="w-5 h-5 ml-2 inline" />
+              </motion.button>
+            ) : (
+              // Step 5 is handled by the form submit button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                form={`step-${currentStep}`}
+                disabled={isSubmitting}
+                className="btn-brand text-lg px-8 py-3"
+              >
+                Complete Setup
+                <ChevronRight className="w-5 h-5 ml-2 inline" />
+              </motion.button>
+            )}
+          </div>
+        </div>
+
+        {/* Step Images */}
+        <div className="mt-12 text-center">
+          <Image
+            src={steps[currentStep - 1].image}
+            alt={steps[currentStep - 1].title}
+            width={600}
+            height={300}
+            className="rounded-2xl shadow-lg mx-auto"
+          />
         </div>
       </div>
     </div>

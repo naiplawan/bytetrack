@@ -23,7 +23,7 @@ import {
   ConfirmDialogAction,
 } from '@/components/ui/confirm-dialog';
 import { searchFoods as searchFoodsApi, getThaiFood, type FoodItem } from '@/lib/thai-food-api';
-import { fadeIn, slideUp, staggerContainer } from '@/lib/motion-variants';
+import { fadeIn, fadeInUp, staggerContainer } from '@/lib/motion-variants';
 import { t } from '@/lib/translations';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -151,29 +151,29 @@ export default function MealsPage() {
 
   return (
     <motion.div
-      className="min-h-screen bg-gradient-to-br from-background via-background to-muted/10"
+      className="min-h-screen bg-gradient-hero scrollbar-brand"
       initial="hidden"
       animate="visible"
       variants={fadeIn}
     >
       <div className="max-w-md mx-auto p-6">
         {/* Header */}
-        <motion.div className="flex items-center justify-between mb-8" variants={slideUp}>
+        <motion.div className="flex items-center justify-between mb-8" variants={fadeInUp}>
           <Link href="/dashboard">
-            <Button variant="ghost" size="icon" className="apple-card-interactive">
+            <Button variant="ghost" size="icon" className="hover:bg-brand/10">
               <ArrowLeft size={20} aria-hidden="true" />
               <span className="sr-only">Back to dashboard</span>
             </Button>
           </Link>
-          <h1 className="spotify-text-heading">{t('meals_foodDiary_i18n', language)}</h1>
-          <Button variant="ghost" size="icon" className="apple-card-interactive">
+          <h1 className="font-heading">{t('meals_foodDiary_i18n', language)}</h1>
+          <Button variant="ghost" size="icon" className="hover:bg-brand/10">
             <Calendar size={20} aria-hidden="true" />
             <span className="sr-only">View calendar</span>
           </Button>
         </motion.div>
 
         {/* Search Bar */}
-        <motion.div variants={slideUp} className="mb-6">
+        <motion.div variants={fadeInUp} className="mb-6">
           <Input
             placeholder={t('meals_searchPlaceholder_i18n', language)}
             value={searchQuery}
@@ -186,16 +186,16 @@ export default function MealsPage() {
         </motion.div>
 
         {/* Daily Intake Card */}
-        <motion.div variants={slideUp} className="mb-8">
+        <motion.div variants={fadeInUp} className="mb-8">
           <Card variant="glass" className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="spotify-text-subheading">{t('meals_dailyGoal_i18n', language)}</h2>
+              <h2 className="font-semibold text-lg">{t('meals_dailyGoal_i18n', language)}</h2>
               <span className="text-sm text-muted-foreground">{new Date().toLocaleDateString(language === 'th' ? 'th-TH' : 'en-US')}</span>
             </div>
             <div className="relative mb-4">
-              <Progress value={calorieProgress} className="h-3 spotify-backdrop border border-border/20" />
+              <Progress value={calorieProgress} className="h-3 bg-white/50 border border-border/20" />
               <motion.div
-                className="absolute top-0 left-0 h-3 bg-gradient-to-r from-primary via-primary/80 to-primary/60 rounded-full"
+                className="absolute top-0 left-0 h-3 bg-gradient-brand rounded-full"
                 initial={{ width: 0 }}
                 animate={{ width: `${Math.min(calorieProgress, 100)}%` }}
                 transition={{ duration: 0.5 }}
@@ -210,35 +210,35 @@ export default function MealsPage() {
 
         {/* Macros */}
         <motion.div className="grid grid-cols-3 gap-4 mb-8" variants={staggerContainer}>
-          <motion.div variants={slideUp}>
+          <motion.div variants={fadeInUp}>
             <Card variant="minimal" className="p-4 text-center">
-              <p className="spotify-text-small font-medium mb-2 text-orange-600">{t('dashboard_carbs_i18n', language)}</p>
+              <p className="text-sm font-medium mb-2 text-orange-600">{t('dashboard_carbs_i18n', language)}</p>
               <div className="relative mb-2">
                 <Progress value={carbProgress} className="h-2" />
               </div>
-              <p className="spotify-text-small text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 {dailyStats.carbs.consumed}g/{dailyStats.carbs.goal}g
               </p>
             </Card>
           </motion.div>
-          <motion.div variants={slideUp}>
+          <motion.div variants={fadeInUp}>
             <Card variant="minimal" className="p-4 text-center">
-              <p className="spotify-text-small font-medium mb-2 text-blue-600">{t('dashboard_protein_i18n', language)}</p>
+              <p className="text-sm font-medium mb-2 text-blue-600">{t('dashboard_protein_i18n', language)}</p>
               <div className="relative mb-2">
                 <Progress value={proteinProgress} className="h-2" />
               </div>
-              <p className="spotify-text-small text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 {dailyStats.protein.consumed}g/{dailyStats.protein.goal}g
               </p>
             </Card>
           </motion.div>
-          <motion.div variants={slideUp}>
+          <motion.div variants={fadeInUp}>
             <Card variant="minimal" className="p-4 text-center">
-              <p className="spotify-text-small font-medium mb-2 text-green-600">{t('dashboard_fat_i18n', language)}</p>
+              <p className="text-sm font-medium mb-2 text-green-600">{t('dashboard_fat_i18n', language)}</p>
               <div className="relative mb-2">
                 <Progress value={fatProgress} className="h-2" />
               </div>
-              <p className="spotify-text-small text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 {dailyStats.fat.consumed}g/{dailyStats.fat.goal}g
               </p>
             </Card>
@@ -248,7 +248,7 @@ export default function MealsPage() {
         {/* Meal Types */}
         <motion.div className="grid grid-cols-4 gap-2 mb-8" variants={staggerContainer}>
           {Object.entries(mealTypeIcons).map(([type, Icon]) => (
-            <motion.div key={type} variants={slideUp} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <motion.div key={type} variants={fadeInUp} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 variant={mealType === type ? 'primary' : 'glass'}
                 size="sm"
@@ -264,9 +264,9 @@ export default function MealsPage() {
         </motion.div>
 
         {/* Today's Meals Section */}
-        <motion.div variants={slideUp} className="mb-8">
+        <motion.div variants={fadeInUp} className="mb-8">
           <Card variant="glass" className="p-4">
-            <h3 className="spotify-text-subheading mb-4">{t('meals_todayEntries_i18n', language)}</h3>
+            <h3 className="font-semibold text-lg mb-4">{t('meals_todayEntries_i18n', language)}</h3>
             <AnimatePresence mode="wait">
               {diaryEntries.length > 0 ? (
                 <motion.div
@@ -347,7 +347,7 @@ export default function MealsPage() {
         </motion.div>
 
         {/* Tabs */}
-        <motion.div variants={slideUp} className="mb-6">
+        <motion.div variants={fadeInUp} className="mb-6">
           <Tabs defaultValue="recently" value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid grid-cols-3 bg-transparent">
               <TabsTrigger
@@ -398,7 +398,7 @@ export default function MealsPage() {
               foodItems.map((food, index) => (
                 <motion.div
                   key={food.id || index}
-                  variants={slideUp}
+                  variants={fadeInUp}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >

@@ -42,7 +42,7 @@ import {
   ConfirmDialogCancel,
   ConfirmDialogAction,
 } from '@/components/ui/confirm-dialog';
-import { fadeIn, slideUp, staggerContainer } from '@/lib/motion-variants';
+import { fadeIn, fadeInUp, staggerContainer } from '@/lib/motion-variants';
 import { searchFoods as searchFoodsApi, getThaiFood, type FoodItem } from '@/lib/thai-food-api';
 import { t } from '@/lib/translations';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -259,7 +259,7 @@ export default function MealPlanPage() {
     >
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <motion.div className="flex items-center gap-4 mb-8" variants={slideUp}>
+        <motion.div className="flex items-center gap-4 mb-8" variants={fadeInUp}>
           <Button variant="ghost" size="icon" onClick={() => router.push('/dashboard')}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
@@ -273,7 +273,7 @@ export default function MealPlanPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Calendar */}
-          <motion.div className="lg:col-span-1" variants={slideUp}>
+          <motion.div className="lg:col-span-1" variants={fadeInUp}>
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -535,7 +535,7 @@ export default function MealPlanPage() {
                     const Icon = mealTypeIcons[mealType];
 
                     return (
-                      <motion.div key={mealType} variants={slideUp}>
+                      <motion.div key={mealType} variants={fadeInUp}>
                         <Card>
                           <CardHeader className="pb-3">
                             <div className="flex items-center gap-2">

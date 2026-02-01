@@ -48,5 +48,20 @@ const InteractiveCard = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HT
 );
 InteractiveCard.displayName = 'InteractiveCard';
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent, GlassCard, InteractiveCard };
+// ByteTrack Brand Card - uses the brand color scheme
+const BrandCard = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(
+        'card-brand transform-gpu',
+        className
+      )}
+      {...props}
+    />
+  )
+);
+BrandCard.displayName = 'BrandCard';
+
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent, GlassCard, InteractiveCard, BrandCard };
 
