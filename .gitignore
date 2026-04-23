@@ -2,26 +2,13 @@
 
 # dependencies
 /node_modules
-frontend/node_modules
 
 # next.js
 /.next/
 /out/
-frontend/.next/
-frontend/out/
 
 # production
 /build
-
-# go
-/backend/bytetrack
-/backend/*.exe
-/backend/*.exe~
-/backend/*.dll
-/backend/*.so
-/backend/*.dylib
-/backend/bin/
-/backend/tmp/
 
 # debug
 npm-debug.log*
@@ -31,7 +18,10 @@ yarn-error.log*
 
 # env files
 .env*
-backend/.env
+
+# lockfiles (pnpm is canonical)
+package-lock.json
+yarn.lock
 
 # vercel
 .vercel
@@ -39,9 +29,13 @@ backend/.env
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-frontend/next-env.d.ts
-frontend/tsconfig.tsbuildinfo
 
 # claude
 .claude/
 *.md.claude
+
+# editor / os
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

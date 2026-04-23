@@ -1,239 +1,138 @@
 # ByteTrack
 
-A modern calorie tracking and wellness application with a separated architecture. Features bilingual support (English/Thai), integration with Open Food Facts API for 3M+ foods, and a beautiful UI inspired by Apple and Spotify design systems.
+A modern calorie tracking and wellness web app built with Next.js 16. Features bilingual support (English/Thai), a local Thai food database alongside the Open Food Facts API, and a polished UI inspired by Apple and Spotify.
+
+> **Note:** This is currently a **frontend-only** app. All persistence (meals, profile, preferences) runs against a mock data layer backed by `localStorage`, so you can run the full experience without any backend or database.
 
 ## Features
 
 ### Food Tracking
-- **Open Food Facts API Integration**: Access to 3M+ foods worldwide (proxied via backend)
+- **Open Food Facts API**: Access to 3M+ foods worldwide (called directly from the client)
 - **Local Thai Food Database**: 20+ authentic Thai dishes with accurate nutrition data
-- **Combined Search**: Searches local database first, then API for comprehensive results
-- **Barcode Scanning Ready**: API support for barcode lookup
+- **Combined Search**: Local database first, then API for broader coverage
 - **Complete Nutrition Data**: Calories, protein, carbs, fat, fiber, sugar, sodium
 
 ### User Experience
-- **Bilingual Support**: Full English and Thai language switching
+- **Bilingual Support**: Full English/Thai switching with JSON-based translations
 - **4-Step Onboarding**: Guided setup with BMR/TDEE calculations
-- **Smart Calorie Goals**: Personalized targets based on user goals (lose/maintain/gain)
+- **Smart Calorie Goals**: Personalized targets based on lose/maintain/gain goals
+- **Smart Insights**: Insight engine surfaces personalized recommendations
 - **Dark/Light Mode**: System preference detection with manual toggle
 - **Smooth Animations**: Framer Motion powered interactions
 
 ### Design System
-- **40+ UI Components**: Cards, buttons, inputs with multiple variants
-- **Glass Morphism Effects**: Modern translucent design elements
-- **Responsive Design**: Mobile-first approach, works on all devices
-- **Accessibility**: WCAG 2.1 AA compliant
-
-## Architecture
-
-ByteTrack uses a separated client-server architecture:
-
-```
-bytetrack/
-├── frontend/          # Next.js 16 client application
-└── backend/           # Go Fiber API server
-```
+- **40+ UI Components**: Built on Radix primitives with design tokens
+- **Glass Morphism Effects**: Modern translucent elements
+- **Responsive Design**: Mobile-first, works across devices
+- **Accessibility**: WCAG 2.1 AA targets
 
 ## Tech Stack
 
-### Frontend
 | Category | Technology |
 |----------|------------|
-| Framework | Next.js 16.1.1 (App Router) |
+| Framework | Next.js 16 (App Router) |
 | Language | TypeScript |
 | Styling | Tailwind CSS |
-| Animations | Framer Motion |
+| UI Primitives | Radix UI + shadcn-style components |
+| Animations | Framer Motion / Motion |
 | Forms | React Hook Form + Zod |
+| Charts | Recharts |
 | Icons | Lucide React |
 | State | React Context |
-
-### Backend
-| Category | Technology |
-|----------|------------|
-| Framework | Go Fiber v2 |
-| Database | PostgreSQL |
-| Auth | JWT Tokens (access + refresh) |
-| Password | bcrypt |
-| Driver | pgx/v5 |
+| Persistence | `localStorage` (mock data layer) |
+| Package Manager | pnpm |
 
 ## Quick Start
 
 ### Prerequisites
-- Node.js 18+
-- Go 1.21+
-- PostgreSQL 14+
+- Node.js 20+
+- pnpm 9+ (`npm i -g pnpm`)
 
-### Backend Setup
-
-```bash
-cd backend
-
-# Copy environment variables
-cp .env.example .env
-
-# Edit .env with your database credentials
-# DB_HOST=localhost
-# DB_PORT=5432
-# DB_USER=bytetrack
-# DB_PASSWORD=your_password
-# DB_NAME=bytetrack
-
-# Run migrations and start server
-go run cmd/api/main.go
-```
-
-Backend runs on [http://localhost:8080](http://localhost:8080)
-
-### Frontend Setup
+### Install & Run
 
 ```bash
-cd frontend
-
 # Install dependencies
-npm install
+pnpm install
 
-# Start development server
-npm run dev
+# Start dev server
+pnpm dev
 
 # Build for production
-npm run build
+pnpm build
 
 # Start production server
-npm start
+pnpm start
+
+# Lint
+pnpm lint
 ```
 
-Frontend runs on [http://localhost:3000](http://localhost:3000)
+App runs on [http://localhost:3000](http://localhost:3000).
 
 ## Project Structure
 
 ```
 bytetrack/
-├── frontend/                    # Next.js 16 application
-│   ├── app/
-│   │   ├── page.tsx            # Landing page
-│   │   ├── dashboard/          # Main dashboard
-│   │   ├── meals/              # Food diary
-│   │   └── onboarding/         # User setup flow
-│   ├── components/
-│   │   ├── ui/                 # Reusable UI components
-│   │   ├── dashboard/          # Dashboard-specific components
-│   │   └── onboarding/         # Onboarding step components
-│   ├── lib/
-│   │   ├── api-client.ts       # Backend API client
-│   │   ├── translations.ts     # i18n translations (EN/TH)
-│   │   └── validations/        # Zod schemas
-│   ├── contexts/
-│   │   └── LanguageContext.tsx # Language state management
-│   └── package.json
-│
-└── backend/                     # Go Fiber API server
-    ├── cmd/api/main.go         # Application entry point
-    ├── internal/
-    │   ├── api/
-    │   │   ├── handler/        # HTTP request handlers
-    │   │   ├── middleware/     # Auth, CORS, logger
-    │   │   └── router.go       # Route configuration
-    │   ├── domain/
-    │   │   ├── entity/         # Domain entities
-    │   │   └── service/        # Business logic
-    │   ├── infrastructure/
-    │   │   ├── config/         # Configuration loading
-    │   │   ├── database/       # PostgreSQL + migrations
-    │   │   ├── repository/     # Data access layer
-    │   │   └── external/       # Open Food Facts client
-    │   └── pkg/
-    │       ├── jwt/            # JWT utilities
-    │       └── password/       # Password hashing
-    ├── go.mod
-    └── .env.example
+├── app/                         # Next.js 16 App Router
+│   ├── page.tsx                 # Landing page
+│   ├── layout.tsx               # Root layout
+│   ├── dashboard/               # Main dashboard
+│   ├── meals/                   # Food diary (add, plan)
+│   ├── onboarding/              # 4-step user setup
+│   ├── analytics/               # Charts & trends
+│   ├── calendar/                # Calendar view
+│   ├── goals/                   # Goal configuration
+│   ├── workouts/                # Workout tracking
+│   ├── profile/                 # User profile
+│   └── settings/                # App settings
+├── components/
+│   ├── ui/                      # Reusable primitives (shadcn-style)
+│   ├── dashboard/               # Dashboard-specific components
+│   ├── onboarding/              # Onboarding step components
+│   └── icons/                   # Custom icons
+├── contexts/
+│   ├── AuthContext.tsx          # Auth/profile state
+│   └── LanguageContext.tsx      # i18n state
+├── hooks/                       # Shared React hooks
+├── lib/
+│   ├── meal-service.ts          # localStorage-backed meal CRUD
+│   ├── food-api.ts              # Open Food Facts client
+│   ├── thai-food-api.ts         # Local Thai food database
+│   ├── calorie-calculator.ts    # BMR/TDEE math
+│   ├── insights-engine.ts       # Smart insights generator
+│   ├── analytics-service.ts     # Analytics aggregation
+│   ├── achievements-service.ts  # Achievement tracking
+│   ├── design-tokens.ts         # Design system tokens
+│   ├── motion-variants.ts       # Framer Motion presets
+│   ├── translations.ts          # Translation helpers
+│   ├── types.ts                 # Shared types
+│   ├── utils.ts                 # Utilities
+│   └── validations/             # Zod schemas
+├── locales/
+│   ├── en.json                  # English translations
+│   └── th.json                  # Thai translations
+├── public/                      # Static assets
+├── styles/                      # Global styles
+├── next.config.mjs
+├── tailwind.config.ts
+├── tsconfig.json
+└── package.json
 ```
 
-## API Endpoints
+## Data Layer
 
-### Authentication
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/auth/register` | Register new user |
-| POST | `/api/v1/auth/login` | Login user |
-| POST | `/api/v1/auth/refresh` | Refresh JWT token |
-| POST | `/api/v1/auth/logout` | Logout user |
+There is no backend server. All user data lives in the browser:
 
-### User Profile
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/user/profile` | Get user profile |
-| PUT | `/api/v1/user/profile` | Update user profile |
+- **Meals** — stored in `localStorage` via `lib/meal-service.ts`
+- **Profile & onboarding** — stored in `localStorage` via `contexts/AuthContext.tsx`
+- **Language preference** — stored in `localStorage` via `contexts/LanguageContext.tsx`
+- **Food search** — local Thai DB (`lib/thai-food-api.ts`) + Open Food Facts called directly from the client
 
-### Onboarding
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/onboarding/complete` | Complete onboarding |
-| GET | `/api/v1/onboarding/status` | Check onboarding status |
-
-### Meals
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/meals` | Get meals (with date filter) |
-| POST | `/api/v1/meals` | Create meal |
-| GET | `/api/v1/meals/:id` | Get meal by ID |
-| PUT | `/api/v1/meals/:id` | Update meal |
-| DELETE | `/api/v1/meals/:id` | Delete meal |
-| GET | `/api/v1/meals/daily/:date` | Get daily stats |
-
-### Foods
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/foods/search` | Search foods (local + API) |
-| GET | `/api/v1/foods/thai` | Get Thai foods |
-| GET | `/api/v1/foods/barcode/:barcode` | Lookup by barcode |
-
-### Favorites & Custom Foods
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/favorites` | Get favorite foods |
-| POST | `/api/v1/favorites` | Add to favorites |
-| DELETE | `/api/v1/favorites/:id` | Remove from favorites |
-| GET | `/api/v1/custom-foods` | Get custom foods |
-| POST | `/api/v1/custom-foods` | Create custom food |
-| DELETE | `/api/v1/custom-foods/:id` | Delete custom food |
+Swapping in a real backend later means replacing the implementations in `lib/*-service.ts` — the UI contracts stay the same.
 
 ## Environment Variables
 
-### Backend (.env)
-```env
-SERVER_PORT=8080
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=bytetrack
-DB_PASSWORD=your_password
-DB_NAME=bytetrack
-JWT_SECRET=your-super-secret-key
-CORS_ALLOWED_ORIGINS=http://localhost:3000
-```
-
-### Frontend (.env.local)
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8080
-```
-
-## Scripts
-
-### Backend
-```bash
-cd backend
-go run cmd/api/main.go    # Development server
-go build -o bytetrack     # Build binary
-./bytetrack               # Run production server
-```
-
-### Frontend
-```bash
-cd frontend
-npm run dev       # Development server
-npm run build     # Production build
-npm run start     # Production server
-npm run lint      # ESLint check
-```
+No environment variables are required for local development. Create `.env.local` only if you need to override defaults (e.g. a future API URL).
 
 ## Browser Support
 
@@ -252,23 +151,15 @@ npm run lint      # ESLint check
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT License — see [LICENSE](LICENSE) for details.
 
 ## Acknowledgments
 
-### Frontend
-- [Next.js](https://nextjs.org/) - React framework
-- [Tailwind CSS](https://tailwindcss.com/) - CSS framework
-- [Framer Motion](https://www.framer.com/motion/) - Animation library
-- [Lucide](https://lucide.dev/) - Icon library
-- [shadcn/ui](https://ui.shadcn.com/) - Component inspiration
-
-### Backend
-- [Fiber](https://gofiber.io/) - Web framework
-- [pgx](https://github.com/jackc/pgx) - PostgreSQL driver
-- [golang-jwt](https://github.com/golang-jwt/jwt) - JWT implementation
-- [Open Food Facts](https://world.openfoodfacts.org/) - Food database API
-
----
-
-Built with Next.js 16, Go Fiber, PostgreSQL, and TypeScript.
+- [Next.js](https://nextjs.org/) — React framework
+- [Tailwind CSS](https://tailwindcss.com/) — CSS framework
+- [Radix UI](https://www.radix-ui.com/) — accessible primitives
+- [shadcn/ui](https://ui.shadcn.com/) — component inspiration
+- [Framer Motion](https://www.framer.com/motion/) — animations
+- [Recharts](https://recharts.org/) — charts
+- [Lucide](https://lucide.dev/) — icons
+- [Open Food Facts](https://world.openfoodfacts.org/) — food database API
