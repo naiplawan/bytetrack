@@ -1,43 +1,47 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Language, getLanguage, setLanguage as setLang } from '@/lib/translations';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState, ReactNode } from 'react';
+import {
+  getLanguage,
+  getTranslations,
+  setLanguage as persistLanguage,
+  type Language,
+  type TranslationKeys,
+} from '@/lib/translations';
 
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: TranslationKeys) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>('th');
-  const [, setTick] = useState(0);
 
-  // Force re-render when language changes
   useEffect(() => {
     setLanguageState(getLanguage());
   }, []);
 
-  const setLanguage = (lang: Language) => {
-    setLang(lang);
+  const setLanguage = useCallback((lang: Language) => {
+    persistLanguage(lang);
     setLanguageState(lang);
-    // Force re-render to update all translated text
-    setTick((prev) => prev + 1);
-  };
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = lang;
+    }
+  }, []);
 
-  // Simple translation function that works with current language
-  const t = (key: string): string => {
-    // This will be replaced by proper t() function usage
-    return key;
-  };
+  const dictionary = useMemo(() => getTranslations(language), [language]);
 
-  return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
-      {children}
-    </LanguageContext.Provider>
+  const t = useCallback(
+    (key: TranslationKeys): string => dictionary[key] ?? (key as string),
+    [dictionary],
   );
+
+  const value = useMemo(() => ({ language, setLanguage, t }), [language, setLanguage, t]);
+
+  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }
 
 export function useLanguage() {
@@ -47,6 +51,3 @@ export function useLanguage() {
   }
   return context;
 }
-
-// Re-export t function for convenience
-export { t as translate } from '@/lib/translations';

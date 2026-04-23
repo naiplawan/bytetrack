@@ -7,9 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/modern-card';
-import { Progress } from '@/components/ui/progress';
 import { calculateBMR, calculateTDEE, calculateTargetCalories, calculateMacroTargets } from '@/lib/calorie-calculator';
-import { t, type TranslationKeys } from '@/lib/translations';
+import { t } from '@/lib/translations';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fadeIn, staggerContainer } from '@/lib/motion-variants';
 import { ChevronLeft, ChevronRight, Sparkles, PartyPopper, Check } from 'lucide-react';
@@ -36,7 +35,7 @@ interface OnboardingFormProps {
     id: number;
     title: string;
     description: string;
-    icon: React.ComponentType<any>;
+    icon: React.ComponentType<{ className?: string }>;
   }>;
 }
 
@@ -92,7 +91,6 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ steps }) => {
     getValues,
     watch,
     handleSubmit,
-    formState: { isValid, errors },
   } = form;
 
   // Watch all form values for auto-save
@@ -238,22 +236,26 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ steps }) => {
 
     try {
       switch (currentStep) {
-        case 1:
+        case 1: {
           const step1Result = step1Schema.safeParse(values);
           return step1Result.success;
-        case 2:
+        }
+        case 2: {
           const step2Result = step2Schema.safeParse(values);
           return step2Result.success;
-        case 3:
+        }
+        case 3: {
           const step3Result = step3Schema.safeParse(values);
           return step3Result.success;
-        case 4:
+        }
+        case 4: {
           const step4Result = step4Schema.safeParse(values);
           return step4Result.success;
+        }
         default:
           return false;
       }
-    } catch (error) {
+    } catch {
       return false;
     }
   };

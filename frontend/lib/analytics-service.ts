@@ -1,6 +1,6 @@
 // Analytics Service - Calculate real stats from meal data
 
-import { getMealsByDate, getTotalCaloriesForDay, getMacrosForDay } from './meal-service';
+import { getTotalCaloriesForDay, getMacrosForDay } from './meal-service';
 
 export interface DailyStats {
   date: Date;
@@ -46,7 +46,6 @@ export async function getDailyStats(days: number, calorieGoal: number = 2000): P
     date.setDate(date.getDate() - i);
     date.setHours(0, 0, 0, 0);
 
-    const meals = getMealsByDate(date);
     const calories = await getTotalCaloriesForDay(date);
     const macros = await getMacrosForDay(date);
 
@@ -148,7 +147,7 @@ export function getWeightEntries(): WeightEntry[] {
     const stored = localStorage.getItem('weightEntries');
     if (stored) {
       const entries = JSON.parse(stored);
-      return entries.map((e: any) => ({ ...e, date: new Date(e.date) }));
+      return entries.map((e: { date: string; weight: number }) => ({ ...e, date: new Date(e.date) }));
     }
   } catch (error) {
     console.error('Error loading weight entries:', error);
@@ -246,7 +245,7 @@ export function getMealFrequency(): { type: string; count: number; percentage: n
     const meals = JSON.parse(stored);
     const typeCounts: Record<string, number> = {};
 
-    meals.forEach((meal: any) => {
+    meals.forEach((meal: { mealType?: string }) => {
       const type = meal.mealType || 'unknown';
       typeCounts[type] = (typeCounts[type] || 0) + 1;
     });

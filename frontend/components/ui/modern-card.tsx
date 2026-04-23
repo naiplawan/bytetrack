@@ -57,9 +57,8 @@ const CardTitle = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & {
     size?: 'sm' | 'md' | 'lg' | 'xl';
-    gradient?: boolean;
   }
->(({ className, size = 'md', gradient = false, ...props }, ref) => {
+>(({ className, size = 'md', ...props }, ref) => {
   const sizes = {
     sm: 'text-lg font-semibold',
     md: 'text-xl font-semibold',
@@ -71,9 +70,8 @@ const CardTitle = React.forwardRef<
     <div
       ref={ref}
       className={cn(
-        'leading-tight tracking-tight',
+        'leading-tight tracking-tight text-foreground',
         sizes[size],
-        gradient && 'bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent',
         className
       )}
       {...props}

@@ -18,7 +18,7 @@ export interface Achievement {
 
 export interface AchievementEvent {
   type: 'meal_logged' | 'goal_hit' | 'streak_day' | 'weight_logged' | 'plan_created';
-  data?: any;
+  data?: unknown;
 }
 
 // Achievement definitions
@@ -260,7 +260,7 @@ export async function getAllAchievements(): Promise<Achievement[]> {
 }
 
 // Track event and check for new unlocks
-export async function trackEvent(event: AchievementEvent): Promise<Achievement[]> {
+export async function trackEvent(_event: AchievementEvent): Promise<Achievement[]> {
   const newUnlocks: Achievement[] = [];
 
   // Get all achievements
@@ -349,7 +349,6 @@ export async function getDashboardAchievements(): Promise<{
 }> {
   const achievements = await getAllAchievements();
   const unlocked = achievements.filter((a) => a.unlocked);
-  const timestamps = JSON.parse(localStorage.getItem('achievementTimestamps') || '{}');
 
   // Get recent unlocks (last 7 days)
   const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;

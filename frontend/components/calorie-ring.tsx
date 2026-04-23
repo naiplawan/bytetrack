@@ -35,7 +35,6 @@ export default function CalorieRing({ consumed, target }: CalorieRingProps) {
 
     // Calculate progress
     const progress = Math.min(consumed / target, 1);
-    const remaining = 1 - progress;
 
     // Clear canvas
     ctx.clearRect(0, 0, width, height);

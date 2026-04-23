@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Lora, Raleway } from 'next/font/google';
+import { Onest } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
@@ -9,30 +9,21 @@ import { LangProvider } from '@/components/lang-provider';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 
-// NEW: Vibrant & Block-based typography
-const lora = Lora({
+const onest = Onest({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-lora',
-  display: 'swap',
-});
-
-const raleway = Raleway({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-raleway',
+  weight: ['300', '400', '500', '600', '700', '800'],
+  variable: '--font-onest',
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'ByteTrack - Track Your Health Journey',
+  title: 'ByteTrack',
   description:
-    'A modern calorie tracking and wellness application with Thai language support. Track calories, monitor activity, and achieve your health goals.',
-  keywords: ['calorie tracker', 'health', 'wellness', 'diet', 'fitness', 'thai food'],
-  authors: [{ name: 'ByteTrack Team' }],
+    'Calorie tracking and nutrition analysis. Log meals, monitor macros, track progress.',
+  authors: [{ name: 'ByteTrack' }],
   openGraph: {
     title: 'ByteTrack',
-    description: 'Track your health journey with our comprehensive calorie and wellness app',
+    description: 'Calorie tracking and nutrition analysis.',
     type: 'website',
   },
 };
@@ -44,7 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${lora.variable} ${raleway.variable} font-sans antialiased`}>
+      <body className={`${onest.variable} font-sans antialiased`}>
         <LangProvider>
           <LanguageProvider>
             <AuthProvider>

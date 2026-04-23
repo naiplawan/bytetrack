@@ -111,7 +111,7 @@ export default function AddFoodPage() {
       } else {
         toast.info('Already in favorites');
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to save favorite');
     }
   };

@@ -1,12 +1,8 @@
-import { apiClient, initializeAuth } from './api-client';
+// Mock meal-service backed by localStorage.
+// Replaces the previous apiClient-based implementation so the UI runs without a backend.
+
 import { z } from 'zod';
 
-// Initialize auth when module is imported (only on client side)
-if (typeof window !== 'undefined') {
-  initializeAuth();
-}
-
-// Type definitions (matching backend models)
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 
 export interface Meal {
@@ -37,7 +33,24 @@ export interface FoodItem {
   image_url?: string;
 }
 
-// Zod schema for validation (client-side)
+export interface UserProfile {
+  user_id: string;
+  age?: number;
+  gender?: 'male' | 'female' | 'other';
+  height?: number;
+  weight?: number;
+  target_weight?: number;
+  activity_level?: 'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active' | 'extra_active';
+  goal?: 'lose_weight' | 'maintain_weight' | 'gain_weight';
+  target_calories?: number;
+  protein_target?: number;
+  carb_target?: number;
+  fat_target?: number;
+  water_target?: number;
+  created_at: string;
+  updated_at: string;
+}
+
 const mealSchema = z.object({
   name: z.string().min(1, 'Meal name is required'),
   calories: z.number().min(0, 'Calories must be positive'),
@@ -49,472 +62,258 @@ const mealSchema = z.object({
   fat: z.number().optional(),
 });
 
-const foodItemSchema = z.object({
-  id: z.union([z.number(), z.string()]),
-  name: z.string(),
-  calories: z.number().optional(),
-  protein: z.number().optional(),
-  carbs: z.number().optional(),
-  fat: z.number().optional(),
-});
+const MEALS_KEY = 'mock_meals';
+const FAVORITES_KEY = 'mock_favorite_foods';
+const CUSTOM_FOODS_KEY = 'mock_custom_foods';
+const SEED_FLAG_KEY = 'mock_meals_seeded';
+const MOCK_USER_ID = 'mock-user';
 
-// Cache for offline support
-class MealCache {
-  private static instance: MealCache;
-  private cache: Map<string, { data: Meal[]; timestamp: number; ttl: number }> = new Map();
-
-  static getInstance(): MealCache {
-    if (!MealCache.instance) {
-      MealCache.instance = new MealCache();
-    }
-    return MealCache.instance;
-  }
-
-  private getCacheKey(date?: string): string {
-    return date ? `meals_${date}` : 'all_meals';
-  }
-
-  set(data: Meal[], date?: string) {
-    const key = this.getCacheKey(date);
-    this.cache.set(key, {
-      data,
-      timestamp: Date.now(),
-      ttl: 5 * 60 * 1000, // 5 minutes cache
-    });
-  }
-
-  get(date?: string): Meal[] | null {
-    const key = this.getCacheKey(date);
-    const cached = this.cache.get(key);
-
-    if (!cached) return null;
-
-    // Check if cache is expired
-    if (Date.now() - cached.timestamp > cached.ttl) {
-      this.cache.delete(key);
-      return null;
-    }
-
-    return cached.data;
-  }
-
-  clear() {
-    this.cache.clear();
-  }
-
-  clearForDate(date?: string) {
-    const key = this.getCacheKey(date);
-    this.cache.delete(key);
-  }
+function uid(prefix = 'm'): string {
+  return `${prefix}_${Math.random().toString(36).slice(2, 10)}_${Date.now().toString(36)}`;
 }
 
-const mealCache = MealCache.getInstance();
-
-// Error handling
-class ApiError extends Error {
-  constructor(
-    message: string,
-    public code?: string,
-    public status?: number
-  ) {
-    super(message);
-    this.name = 'ApiError';
-  }
+function nowIso(): string {
+  return new Date().toISOString();
 }
 
-// Handle API errors
-async function handleApiCall<T>(apiCall: () => Promise<T>): Promise<T> {
+function isBrowser(): boolean {
+  return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
+}
+
+function readAllMeals(): Meal[] {
+  if (!isBrowser()) return [];
+  maybeSeed();
   try {
-    return await apiCall();
-  } catch (error: any) {
-    if (error.message?.includes('Failed to fetch')) {
-      throw new ApiError('Network error. Please check your connection.', 'NETWORK_ERROR', 0);
-    }
-    if (error.message?.includes('401')) {
-      throw new ApiError('Session expired. Please login again.', 'UNAUTHORIZED', 401);
-    }
-    if (error.message?.includes('403')) {
-      throw new ApiError('Access denied.', 'FORBIDDEN', 403);
-    }
-    if (error.message?.includes('404')) {
-      throw new ApiError('Resource not found.', 'NOT_FOUND', 404);
-    }
-    if (error.message?.includes('429')) {
-      throw new ApiError('Too many requests. Please try again later.', 'RATE_LIMITED', 429);
-    }
-    if (error.message?.includes('500')) {
-      throw new ApiError('Server error. Please try again later.', 'SERVER_ERROR', 500);
-    }
-    throw new ApiError(error.message || 'An unexpected error occurred', 'UNKNOWN_ERROR');
+    const raw = localStorage.getItem(MEALS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as Meal[]) : [];
+  } catch {
+    return [];
   }
 }
 
-// Load meals from cache or API
-async function loadMeals(date?: Date): Promise<Meal[]> {
-  const dateString = date ? date.toISOString().split('T')[0] : undefined;
-
-  // Try to get from cache first
-  const cached = mealCache.get(dateString);
-  if (cached) {
-    return cached;
-  }
-
-  // Fetch from API
-  return handleApiCall(async () => {
-    const response = await apiClient.getMeals(1, 100, dateString);
-
-    if (!response.success || !response.data) {
-      throw new ApiError('Failed to load meals');
-    }
-
-    // Transform meal_type to mealType for consistency
-    const meals: Meal[] = response.data.map((meal: any) => ({
-      ...meal,
-      mealType: meal.meal_type,
-    }));
-
-    // Store in cache
-    mealCache.set(meals, dateString);
-
-    return meals;
-  });
+function writeAllMeals(meals: Meal[]): void {
+  if (!isBrowser()) return;
+  localStorage.setItem(MEALS_KEY, JSON.stringify(meals));
 }
 
-// Get meals by date
+function sameLocalDay(iso: string, day: Date): boolean {
+  const d = new Date(iso);
+  return (
+    d.getFullYear() === day.getFullYear() &&
+    d.getMonth() === day.getMonth() &&
+    d.getDate() === day.getDate()
+  );
+}
+
+function maybeSeed(): void {
+  if (!isBrowser()) return;
+  if (localStorage.getItem(SEED_FLAG_KEY)) return;
+
+  const today = new Date();
+  const seeded: Meal[] = [];
+  const templates: Array<Omit<Meal, 'id' | 'user_id' | 'date' | 'created_at' | 'updated_at'>> = [
+    { name: 'Greek yogurt with berries', calories: 220, grams: 200, mealType: 'breakfast', protein: 18, carbs: 28, fat: 4 },
+    { name: 'Oatmeal with banana', calories: 310, grams: 250, mealType: 'breakfast', protein: 10, carbs: 58, fat: 5 },
+    { name: 'Grilled chicken salad', calories: 450, grams: 350, mealType: 'lunch', protein: 42, carbs: 20, fat: 22 },
+    { name: 'Pad krapao moo', calories: 620, grams: 320, mealType: 'lunch', protein: 32, carbs: 65, fat: 24 },
+    { name: 'Salmon with rice', calories: 580, grams: 330, mealType: 'dinner', protein: 38, carbs: 55, fat: 22 },
+    { name: 'Tofu stir fry', calories: 420, grams: 300, mealType: 'dinner', protein: 24, carbs: 40, fat: 18 },
+    { name: 'Apple & almonds', calories: 180, grams: 150, mealType: 'snack', protein: 5, carbs: 22, fat: 9 },
+  ];
+
+  // Seven days of meals, roughly 3 per day.
+  for (let i = 6; i >= 0; i--) {
+    const day = new Date(today);
+    day.setDate(today.getDate() - i);
+
+    const pickedTypes: MealType[] = ['breakfast', 'lunch', 'dinner'];
+    if (i % 2 === 0) pickedTypes.push('snack');
+
+    for (const type of pickedTypes) {
+      const candidates = templates.filter(t => t.mealType === type);
+      const picked = candidates[Math.floor(Math.random() * candidates.length)];
+      if (!picked) continue;
+
+      const slot = new Date(day);
+      const hour = type === 'breakfast' ? 8 : type === 'lunch' ? 12 : type === 'dinner' ? 19 : 16;
+      slot.setHours(hour, Math.floor(Math.random() * 50), 0, 0);
+
+      seeded.push({
+        ...picked,
+        id: uid('m'),
+        user_id: MOCK_USER_ID,
+        date: slot.toISOString(),
+        created_at: slot.toISOString(),
+        updated_at: slot.toISOString(),
+      });
+    }
+  }
+
+  localStorage.setItem(MEALS_KEY, JSON.stringify(seeded));
+  localStorage.setItem(SEED_FLAG_KEY, '1');
+}
+
+function readFoodList(key: string): FoodItem[] {
+  if (!isBrowser()) return [];
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as FoodItem[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeFoodList(key: string, items: FoodItem[]): void {
+  if (!isBrowser()) return;
+  localStorage.setItem(key, JSON.stringify(items));
+}
+
+// --- Public API ---
+
 export async function getMealsByDate(date: Date): Promise<Meal[]> {
-  return loadMeals(date);
+  const all = readAllMeals();
+  return all.filter(m => sameLocalDay(m.date, date));
 }
 
-// Get meals by type
 export async function getMealsByType(type: string): Promise<Meal[]> {
   const today = new Date();
-  const meals = await loadMeals(today);
-  return meals.filter((meal) => meal.mealType === type);
+  const meals = await getMealsByDate(today);
+  return meals.filter(m => m.mealType === type);
 }
 
-// Get today's meals (with fallback to cache if offline)
 export async function getTodayMeals(): Promise<Meal[]> {
-  const today = new Date();
-  return getMealsByDate(today);
+  return getMealsByDate(new Date());
 }
 
-// Add a new meal
-export async function addMeal(mealData: Omit<Meal, 'id' | 'user_id' | 'created_at' | 'updated_at'>): Promise<Meal> {
-  // Validate data
+export async function addMeal(
+  mealData: Omit<Meal, 'id' | 'user_id' | 'created_at' | 'updated_at'>,
+): Promise<Meal> {
   const validated = mealSchema.parse(mealData);
-
-  return handleApiCall(async () => {
-    // Transform mealType to meal_type for API
-    const apiMealData = {
-      ...validated,
-      meal_type: validated.mealType,
-    };
-
-    const response = await apiClient.createMeal(apiMealData);
-
-    if (!response.success || !response.data) {
-      throw new ApiError('Failed to create meal');
-    }
-
-    // Transform response data back to mealType format
-    const meal: Meal = {
-      ...response.data,
-      mealType: (response.data as any).meal_type || validated.mealType,
-    };
-
-    // Clear cache for the date
-    mealCache.clearForDate(mealData.date.split('T')[0]);
-
-    return meal;
-  });
+  const now = nowIso();
+  const meal: Meal = {
+    ...mealData,
+    ...validated,
+    id: uid('m'),
+    user_id: MOCK_USER_ID,
+    created_at: now,
+    updated_at: now,
+  };
+  const all = readAllMeals();
+  all.push(meal);
+  writeAllMeals(all);
+  return meal;
 }
 
-// Update a meal
 export async function updateMeal(id: string, mealData: Partial<Meal>): Promise<Meal> {
-  // Validate data
-  if (mealData.name) mealData.name = mealSchema.parse({ ...mealData, calories: mealData.calories || 0, grams: mealData.grams || 0, mealType: mealData.mealType || 'breakfast' }).name;
-
-  return handleApiCall(async () => {
-    // Transform mealType to meal_type for API, excluding undefined values
-    const apiMealData: any = {};
-    for (const [key, value] of Object.entries(mealData)) {
-      if (key === 'mealType') {
-        apiMealData.meal_type = value;
-      } else if (value !== undefined) {
-        apiMealData[key] = value;
-      }
-    }
-
-    const response = await apiClient.updateMeal(id, apiMealData);
-
-    if (!response.success || !response.data) {
-      throw new ApiError('Failed to update meal');
-    }
-
-    // Transform response data back to mealType format
-    const meal: Meal = {
-      ...response.data,
-      mealType: (response.data as any).meal_type || mealData.mealType || 'breakfast',
-    };
-
-    // Clear cache for the date
-    const mealDate = meal.date.split('T')[0];
-    mealCache.clearForDate(mealDate);
-
-    return meal;
-  });
+  const all = readAllMeals();
+  const idx = all.findIndex(m => m.id === id);
+  if (idx === -1) throw new Error('Meal not found');
+  const updated: Meal = { ...all[idx], ...mealData, updated_at: nowIso() };
+  all[idx] = updated;
+  writeAllMeals(all);
+  return updated;
 }
 
-// Delete a meal
 export async function deleteMeal(id: string): Promise<boolean> {
-  return handleApiCall(async () => {
-    const response = await apiClient.deleteMeal(id);
-
-    if (!response.success) {
-      throw new ApiError(response.message || 'Failed to delete meal', response.error_code);
-    }
-
-    // Clear cache for the date
-    const meal = await getMealById(id); // Get meal to know its date
-    if (meal) {
-      const mealDate = meal.date.split('T')[0];
-      mealCache.clearForDate(mealDate);
-    }
-
-    return true;
-  });
+  const all = readAllMeals();
+  const next = all.filter(m => m.id !== id);
+  writeAllMeals(next);
+  return next.length !== all.length;
 }
 
-// Get meal by ID
 export async function getMealById(id: string): Promise<Meal | null> {
-  try {
-    const response = await apiClient.getMealById(id);
-
-    if (response.success && response.data) {
-      // Transform meal_type to mealType
-      return {
-        ...response.data,
-        mealType: (response.data as any).meal_type,
-      };
-    }
-
-    return null;
-  } catch (error) {
-    // If offline, try to get from cache
-    const allMeals = await loadMeals();
-    return allMeals.find(meal => meal.id === id) || null;
-  }
+  return readAllMeals().find(m => m.id === id) ?? null;
 }
 
-// Get total calories for a day
 export async function getTotalCaloriesForDay(date: Date): Promise<number> {
   const meals = await getMealsByDate(date);
-  return meals.reduce((total, meal) => total + meal.calories, 0);
+  return meals.reduce((sum, m) => sum + m.calories, 0);
 }
 
-// Get macros for a day
-export async function getMacrosForDay(date: Date): Promise<{ protein: number; carbs: number; fat: number }> {
+export async function getMacrosForDay(
+  date: Date,
+): Promise<{ protein: number; carbs: number; fat: number }> {
   const meals = await getMealsByDate(date);
-
   return meals.reduce(
-    (macros, meal) => ({
-      protein: macros.protein + (meal.protein || 0),
-      carbs: macros.carbs + (meal.carbs || 0),
-      fat: macros.fat + (meal.fat || 0),
+    (acc, m) => ({
+      protein: acc.protein + (m.protein ?? 0),
+      carbs: acc.carbs + (m.carbs ?? 0),
+      fat: acc.fat + (m.fat ?? 0),
     }),
     { protein: 0, carbs: 0, fat: 0 },
   );
 }
 
-// Get favorite foods
 export async function getFavoriteFoods(): Promise<FoodItem[]> {
-  try {
-    return handleApiCall(async () => {
-      const response = await apiClient.getFavorites();
-
-      if (!response.success || !response.data) {
-        throw new ApiError(response.message || 'Failed to load favorite foods', response.error_code);
-      }
-
-      return response.data;
-    });
-  } catch (error) {
-    // Fallback to localStorage if API fails (offline support)
-    try {
-      const storedData = localStorage.getItem("favoriteFoods");
-      if (storedData) {
-        const parsed = JSON.parse(storedData) as unknown[];
-        const result = z.array(foodItemSchema).safeParse(parsed);
-        return result.success ? result.data : [];
-      }
-    } catch (localStorageError) {
-      console.error('Error loading favorite foods from cache:', localStorageError);
-    }
-    return [];
-  }
+  return readFoodList(FAVORITES_KEY);
 }
 
-// Add a food to favorites
 export async function addFavoriteFood(food: FoodItem): Promise<void> {
-  return handleApiCall(async () => {
-    const response = await apiClient.addFavorite(food);
-
-    if (!response.success) {
-      throw new ApiError(response.message || 'Failed to add favorite food', response.error_code);
-    }
-  });
+  const list = readFoodList(FAVORITES_KEY);
+  if (!list.some(f => f.id === food.id)) {
+    list.push(food);
+    writeFoodList(FAVORITES_KEY, list);
+  }
 }
 
-// Remove a food from favorites
 export async function removeFavoriteFood(foodId: string | number): Promise<void> {
-  return handleApiCall(async () => {
-    const response = await apiClient.removeFavorite(foodId);
-
-    if (!response.success) {
-      throw new ApiError(response.message || 'Failed to remove favorite food', response.error_code);
-    }
-  });
+  const list = readFoodList(FAVORITES_KEY).filter(f => f.id !== foodId);
+  writeFoodList(FAVORITES_KEY, list);
 }
 
-// Get custom foods
 export async function getCustomFoods(): Promise<FoodItem[]> {
-  try {
-    return handleApiCall(async () => {
-      const response = await apiClient.getCustomFoods();
-
-      if (!response.success || !response.data) {
-        throw new ApiError(response.message || 'Failed to load custom foods', response.error_code);
-      }
-
-      return response.data;
-    });
-  } catch (error) {
-    // Fallback to localStorage if API fails (offline support)
-    try {
-      const storedData = localStorage.getItem("customFoods");
-      if (storedData) {
-        const parsed = JSON.parse(storedData) as unknown[];
-        const result = z.array(foodItemSchema).safeParse(parsed);
-        return result.success ? result.data : [];
-      }
-    } catch (localStorageError) {
-      console.error('Error loading custom foods from cache:', localStorageError);
-    }
-    return [];
-  }
+  return readFoodList(CUSTOM_FOODS_KEY);
 }
 
-// Add a custom food
 export async function addCustomFood(food: Omit<FoodItem, 'id'>): Promise<FoodItem | null> {
-  return handleApiCall(async () => {
-    const response = await apiClient.createCustomFood(food);
-
-    if (!response.success || !response.data) {
-      throw new ApiError(response.message || 'Failed to create custom food', response.error_code);
-    }
-
-    return response.data;
-  });
+  const created: FoodItem = { ...food, id: uid('f') };
+  const list = readFoodList(CUSTOM_FOODS_KEY);
+  list.push(created);
+  writeFoodList(CUSTOM_FOODS_KEY, list);
+  return created;
 }
 
-// Search foods
-export async function searchFoods(query: string, page = 1, pageSize = 20): Promise<{ items: FoodItem[]; total: number; hasMore: boolean }> {
-  try {
-    const response = await apiClient.searchFoods(query, page, pageSize);
-
-    if (!response.success || !response.data) {
-      throw new ApiError('Failed to search foods');
-    }
-
-    return {
-      items: response.data,
-      total: response.total,
-      hasMore: response.has_more,
-    };
-  } catch (error) {
-    // Fallback to cached Thai foods if API fails
-    try {
-      const thaiResponse = await apiClient.getThaiFoods(1, 50);
-      if (thaiResponse.success && thaiResponse.data) {
-        const filtered = thaiResponse.data.filter(food =>
-          food.name.toLowerCase().includes(query.toLowerCase())
-        );
-        return {
-          items: filtered.slice(0, pageSize),
-          total: filtered.length,
-          hasMore: false,
-        };
-      }
-    } catch (fallbackError) {
-      console.error('Fallback search also failed:', fallbackError);
-    }
-
-    throw error;
-  }
+export async function searchFoods(
+  query: string,
+  page = 1,
+  pageSize = 20,
+): Promise<{ items: FoodItem[]; total: number; hasMore: boolean }> {
+  const all = [...readFoodList(CUSTOM_FOODS_KEY), ...readFoodList(FAVORITES_KEY)];
+  const q = query.trim().toLowerCase();
+  const filtered = q ? all.filter(f => f.name.toLowerCase().includes(q)) : all;
+  const start = (page - 1) * pageSize;
+  const slice = filtered.slice(start, start + pageSize);
+  return { items: slice, total: filtered.length, hasMore: start + slice.length < filtered.length };
 }
 
-// Get Thai foods
-export async function getThaiFoods(page = 1, pageSize = 20): Promise<FoodItem[]> {
-  try {
-    const response = await apiClient.getThaiFoods(page, pageSize);
-
-    if (!response.success || !response.data) {
-      throw new ApiError('Failed to load Thai foods');
-    }
-
-    return response.data;
-  } catch (error) {
-    // Fallback to localStorage if API fails
-    const cached = localStorage.getItem('thaiFoodCache');
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        return Array.isArray(parsed) ? parsed.slice(0, pageSize) : [];
-      } catch (parseError) {
-        console.error('Error parsing Thai food cache:', parseError);
-      }
-    }
-    throw error;
-  }
+export async function getThaiFoods(_page = 1, pageSize = 20): Promise<FoodItem[]> {
+  return readFoodList(CUSTOM_FOODS_KEY).slice(0, pageSize);
 }
 
-// Cache Thai foods for offline use
-export async function cacheThaiFoods(foods: FoodItem[]): Promise<void> {
-  try {
-    localStorage.setItem('thaiFoodCache', JSON.stringify(foods));
-  } catch (error) {
-    console.error('Error caching Thai foods:', error);
-  }
+export async function cacheThaiFoods(_foods: FoodItem[]): Promise<void> {
+  // No-op in mock mode.
 }
 
-// Clear all caches
 export function clearMealCache(): void {
-  mealCache.clear();
-  localStorage.removeItem('thaiFoodCache');
+  if (!isBrowser()) return;
+  localStorage.removeItem(MEALS_KEY);
+  localStorage.removeItem(SEED_FLAG_KEY);
 }
 
-// Get user profile
-export async function getUserProfile(): Promise<any> {
-  return handleApiCall(async () => {
-    const response = await apiClient.getProfile();
-
-    if (!response.success || !response.data) {
-      throw new ApiError(response.message || 'Failed to load profile', response.error_code);
-    }
-
-    return response.data;
-  });
+export async function getUserProfile(): Promise<UserProfile> {
+  if (!isBrowser()) throw new Error('Profile unavailable');
+  const raw = localStorage.getItem('mock_profile');
+  if (!raw) throw new Error('Profile unavailable');
+  return JSON.parse(raw) as UserProfile;
 }
 
-// Update user profile
-export async function updateUserProfile(profile: Partial<any>): Promise<any> {
-  return handleApiCall(async () => {
-    const response = await apiClient.updateProfile(profile);
-
-    if (!response.success || !response.data) {
-      throw new ApiError(response.message || 'Failed to update profile', response.error_code);
-    }
-
-    return response.data;
-  });
+export async function updateUserProfile(profile: Partial<UserProfile>): Promise<UserProfile> {
+  const current = await getUserProfile();
+  const next: UserProfile = { ...current, ...profile, updated_at: nowIso() };
+  localStorage.setItem('mock_profile', JSON.stringify(next));
+  return next;
 }

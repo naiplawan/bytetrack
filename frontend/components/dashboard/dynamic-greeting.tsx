@@ -58,7 +58,7 @@ export function DynamicGreeting({ userName }: DynamicGreetingProps) {
       transition={{ duration: 0.6 }}
     >
       <h1 className="spotify-text-hero text-4xl lg:text-5xl mb-4">
-        {greetingText}! {emoji}
+        {greetingText}{userName ? `, ${userName}` : ''}! {emoji}
       </h1>
       <p className="spotify-text-body text-xl">
         {t('greeting_subtitle_i18n', language)}

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, ChevronDown, Languages } from 'lucide-react';
+import { ChevronDown, Languages } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { t, type Language } from '@/lib/translations';
 

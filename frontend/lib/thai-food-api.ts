@@ -9,7 +9,6 @@ import {
   getProductByBarcode,
   toLegacyFoodItem,
   type FoodItem as NewFoodItem,
-  type FoodCategory as NewFoodCategory,
   type SearchResult,
 } from './food-api';
 

@@ -27,7 +27,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       helperText,
       leftIcon,
       rightIcon,
-      animate = true,
+      animate: _animate = true,
       ...props
     },
     ref

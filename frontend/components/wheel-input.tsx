@@ -31,7 +31,7 @@ interface WheelHeightInputProps {
   placeholder?: string;
 }
 
-export function WheelHeightInput({ value, onChange, placeholder }: WheelHeightInputProps) {
+export function WheelHeightInput({ value, onChange, placeholder: _placeholder }: WheelHeightInputProps) {
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {

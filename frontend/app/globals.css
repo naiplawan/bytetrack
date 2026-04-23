@@ -1,12 +1,12 @@
 /**
  * ByteTrack Global Styles
  *
- * Modern Gradient Design System
- * Primary: Purple-to-Pink Gradient (#8B5CF6 → #EC4899)
- * Typography: Lora (headings) / Raleway (body)
+ * Clinical Precision Design System
+ * Primary: Deep Teal (#0F766E)
+ * Typography: Onest (geometric sans)
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -14,68 +14,78 @@
 
 @layer base {
   :root {
-    /* Modern Gradient Color Palette */
-    --background: 0 0% 98%; /* Very light cool background */
-    --foreground: 240 10% 12%; /* High contrast dark text */
+    --background: 40 20% 98%;
+    --foreground: 20 14% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 12%;
+    --card-foreground: 20 14% 11%;
 
-    --primary: 263 70% 60%; /* #8B5CF6 - Modern Purple */
+    --primary: 171 84% 23%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 330 81% 65%; /* #EC4899 - Modern Pink */
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 210 14% 96%;
+    --secondary-foreground: 20 14% 11%;
 
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 50%;
+    --muted: 60 4% 95%;
+    --muted-foreground: 25 5% 45%;
 
-    --accent: 174 72% 56%; /* #06B6D4 - Cyan */
+    --accent: 24 95% 53%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 5% 90%;
-    --input: 240 5% 94%;
-    --ring: 263 70% 60%;
+    --border: 20 6% 90%;
+    --input: 20 6% 93%;
+    --ring: 171 84% 23%;
 
-    --chart-1: 263 70% 60%; /* Purple */
-    --chart-2: 330 81% 65%; /* Pink */
-    --chart-3: 174 72% 56%; /* Cyan */
-    --chart-4: 142 71% 45%; /* Emerald */
-    --chart-5: 28 90% 60%; /* Amber */
+    --chart-1: 171 84% 23%;
+    --chart-2: 24 95% 53%;
+    --chart-3: 220 70% 50%;
+    --chart-4: 142 71% 45%;
+    --chart-5: 40 90% 50%;
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 240 10% 12%;
-    --sidebar-primary: 263 70% 60%;
+    --sidebar-foreground: 20 14% 11%;
+    --sidebar-primary: 171 84% 23%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 5% 96%;
-    --sidebar-accent-foreground: 240 10% 12%;
-    --sidebar-border: 240 5% 90%;
-    --sidebar-ring: 263 70% 60%;
+    --sidebar-accent: 60 4% 95%;
+    --sidebar-accent-foreground: 20 14% 11%;
+    --sidebar-border: 20 6% 90%;
+    --sidebar-ring: 171 84% 23%;
 
-    --radius: 1.5rem;
+    --radius: 0.75rem;
+
+    --success: 142 71% 45%;
+    --warning: 38 92% 50%;
+    --error: 0 72% 51%;
+    --info: 220 70% 50%;
   }
 
   .dark {
-    --background: 220 17% 12%;
-    --foreground: 0 0% 95%;
+    --background: 220 20% 8%;
+    --foreground: 40 10% 95%;
 
-    --card: 220 17% 16%;
-    --card-foreground: 0 0% 95%;
+    --card: 220 18% 12%;
+    --card-foreground: 40 10% 95%;
 
-    --muted: 220 17% 20%;
-    --muted-foreground: 0 0% 60%;
+    --primary: 171 60% 45%;
+    --primary-foreground: 0 0% 100%;
 
-    --border: 220 17% 24%;
-    --input: 220 17% 20%;
+    --secondary: 220 14% 18%;
+    --secondary-foreground: 40 10% 95%;
 
-    --sidebar-background: 220 17% 12%;
-    --sidebar-foreground: 0 0% 85%;
-    --sidebar-accent: 220 17% 20%;
-    --sidebar-accent-foreground: 0 0% 85%;
-    --sidebar-border: 220 17% 24%;
+    --muted: 220 14% 18%;
+    --muted-foreground: 220 10% 55%;
+
+    --border: 220 14% 20%;
+    --input: 220 14% 18%;
+
+    --sidebar-background: 220 20% 8%;
+    --sidebar-foreground: 40 10% 88%;
+    --sidebar-accent: 220 14% 18%;
+    --sidebar-accent-foreground: 40 10% 88%;
+    --sidebar-border: 220 14% 20%;
   }
 
   * {
@@ -84,211 +94,95 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    font-family: 'Raleway', ui-sans-serif, system-ui, sans-serif;
-    font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-feature-settings: 'tnum' 1, 'lnum' 1, 'case' 1, 'ss01' 1;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6, .font-heading {
-    font-family: 'Lora', serif;
     font-weight: 700;
+    letter-spacing: -0.025em;
   }
 }
 
 /* ============================================
-   COMPONENT STYLES - Vibrant & Block-based
+   COMPONENT STYLES
    ============================================ */
 
-/* Brand Button Styles - Modern Gradient */
 .btn-brand {
-  @apply relative inline-flex items-center justify-center;
-  @apply px-8 py-4 rounded-full font-semibold text-white;
-  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
-  box-shadow: 0 10px 40px rgba(139, 92, 246, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  @apply relative inline-flex items-center justify-center gap-2;
+  @apply px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200;
+  @apply bg-foreground text-background;
 }
 
 .btn-brand:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 15px 50px rgba(139, 92, 246, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
-  background: linear-gradient(135deg, #9333EA 0%, #F472B6 100%);
+  @apply bg-foreground/90;
 }
 
 .btn-brand:active {
-  transform: translateY(0);
-  box-shadow: 0 5px 20px rgba(139, 92, 246, 0.3);
+  @apply bg-foreground/80 scale-[0.98];
 }
 
-/* Secondary Button */
 .btn-secondary {
-  @apply inline-flex items-center justify-center;
-  @apply px-8 py-4 rounded-full font-semibold;
-  border: 2px solid transparent;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
-  color: #8B5CF6;
-  background-clip: padding-box;
-  transition: all 0.3s ease;
+  @apply inline-flex items-center justify-center gap-2;
+  @apply px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200;
+  @apply bg-secondary text-foreground;
+  @apply hover:bg-secondary/80;
 }
 
-.btn-secondary:hover {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.2);
-}
-
-/* Card Styles - Modern with subtle gradient */
 .card-brand {
-  @apply bg-white rounded-3xl border border-gray-100/50;
-  @apply p-6 transition-all duration-300;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(139, 92, 246, 0.05) inset;
+  @apply bg-card rounded-xl border border-border p-5;
+  @apply transition-colors duration-200;
 }
 
 .card-brand:hover {
-  transform: translateY(-4px);
-  border-color: rgba(139, 92, 246, 0.2);
-  box-shadow: 0 20px 40px rgba(139, 92, 246, 0.12), 0 0 0 1px rgba(139, 92, 246, 0.1) inset;
+  @apply border-border;
 }
 
-/* Input Styles */
 .input-brand {
-  @apply w-full px-5 py-4 rounded-2xl border-2 bg-white;
-  @apply text-foreground placeholder:text-muted-foreground;
-  border-color: rgba(139, 92, 246, 0.15);
-  transition: all 0.3s ease;
+  @apply w-full px-4 py-3 rounded-lg border bg-card text-foreground;
+  @apply placeholder:text-muted-foreground;
+  @apply transition-colors duration-200;
+  @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1;
 }
 
-.input-brand:focus {
-  outline: none;
-  border-color: #8B5CF6;
-  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
-}
-
-/* Badge Styles */
 .badge {
-  @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium;
 }
 
 .badge-brand {
-  @apply bg-brand/10 text-brand;
+  @apply bg-primary/10 text-primary;
 }
 
 .badge-success {
-  @apply bg-success/10 text-success;
+  @apply bg-emerald-50 text-emerald-700;
 }
 
 .badge-warning {
-  @apply bg-warning/10 text-warning;
+  @apply bg-amber-50 text-amber-700;
 }
 
 /* Meal Type Badges */
-.meal-badge {
-  @apply badge;
-}
-
 .meal-badge-breakfast {
-  @apply bg-meal-breakfast/10 text-meal-breakfast;
+  @apply bg-amber-50 text-amber-700;
 }
 
 .meal-badge-lunch {
-  @apply bg-meal-lunch/10 text-meal-lunch;
+  @apply bg-emerald-50 text-emerald-700;
 }
 
 .meal-badge-dinner {
-  @apply bg-meal-dinner/10 text-meal-dinner;
+  @apply bg-blue-50 text-blue-700;
 }
 
 .meal-badge-snack {
-  @apply bg-meal-snack/10 text-meal-snack;
-}
-
-/* ============================================
-   GEOMETRIC DECORATIONS
-   ============================================ */
-
-/* Rotating Geometric Shape */
-.geo-shape {
-  position: absolute;
-  animation: rotate-slow 30s linear infinite;
-}
-
-/* Morphing Blob */
-.geo-blob {
-  animation: morph-shape 8s ease-in-out infinite;
-}
-
-/* Floating Element */
-.geo-float {
-  animation: float-up 4s ease-in-out infinite;
-}
-
-/* ============================================
-   GRADIENT BACKGROUNDS - Modern
-   ============================================ */
-
-.bg-gradient-brand {
-  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 50%, #F472B6 100%);
-}
-
-.bg-gradient-hero {
-  background: linear-gradient(135deg, #FAF5FF 0%, #FDF2F8 25%, #F5F3FF 50%, #ECFEFF 100%);
-}
-
-.bg-gradient-dark {
-  background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4C1D95 100%);
-}
-
-.bg-gradient-vibrant {
-  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 30%, #F472B6 60%, #06B6D4 100%);
-}
-
-.bg-gradient-mesh {
-  background:
-    radial-gradient(at 40% 20%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
-    radial-gradient(at 80% 0%, rgba(236, 72, 153, 0.12) 0px, transparent 50%),
-    radial-gradient(at 0% 50%, rgba(6, 182, 212, 0.1) 0px, transparent 50%),
-    radial-gradient(at 80% 50%, rgba(139, 92, 246, 0.08) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%),
-    radial-gradient(at 80% 100%, rgba(6, 182, 212, 0.08) 0px, transparent 50%);
-  background-color: #FAF5FF;
-}
-
-/* Text Gradient */
-.text-gradient-brand {
-  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 50%, #F472B6 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.text-gradient-vibrant {
-  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 30%, #F472B6 60%, #06B6D4 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  @apply bg-violet-50 text-violet-700;
 }
 
 /* ============================================
    PROGRESS INDICATORS
    ============================================ */
 
-/* Progress Bar - Block-based */
-.progress-blocks {
-  @apply flex gap-1;
-}
-
-.progress-block {
-  @apply h-2 flex-1 rounded-full transition-all duration-300;
-}
-
-.progress-block-filled {
-  @apply bg-brand;
-}
-
-.progress-block-empty {
-  @apply bg-gray-200;
-}
-
-/* Circular Progress */
 .progress-ring {
   transform: rotate(-90deg);
 }
@@ -297,25 +191,29 @@
   transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.macro-bar {
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: hsl(var(--muted));
+}
+
+.macro-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /* ============================================
    LOADING STATES
    ============================================ */
 
-/* Skeleton Loader */
 .skeleton {
-  @apply bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100;
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
+  @apply animate-pulse bg-muted rounded-lg;
 }
 
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* Loading Spinner */
 .spinner {
-  @apply w-6 h-6 border-2 border-brand/20 border-t-brand rounded-full;
+  @apply w-5 h-5 border-2 border-border border-t-foreground rounded-full;
   animation: spin 0.8s linear infinite;
 }
 
@@ -328,8 +226,8 @@
    ============================================ */
 
 .scrollbar-brand::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 .scrollbar-brand::-webkit-scrollbar-track {
@@ -337,68 +235,42 @@
 }
 
 .scrollbar-brand::-webkit-scrollbar-thumb {
-  background: rgba(220, 38, 38, 0.3);
-  border-radius: 4px;
+  background: hsl(var(--border));
+  border-radius: 3px;
 }
 
 .scrollbar-brand::-webkit-scrollbar-thumb:hover {
-  background: rgba(220, 38, 38, 0.5);
+  background: hsl(var(--muted-foreground) / 0.4);
 }
 
 /* ============================================
    CELEBRATION ANIMATIONS
    ============================================ */
 
-/* Pop In Animation */
 @keyframes celebrate-pop {
-  0% {
-    transform: scale(0) rotate(-180deg);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.2) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 .animate-celebrate {
-  animation: celebrate-pop 0.5s ease-out forwards;
-}
-
-/* Confetti Drop */
-@keyframes confetti-drop {
-  0% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100px) rotate(360deg);
-    opacity: 0;
-  }
+  animation: celebrate-pop 0.4s ease-out forwards;
 }
 
 /* ============================================
    ACCESSIBILITY
    ============================================ */
 
-/* Focus Styles */
 *:focus-visible {
-  @apply outline-none ring-2 ring-brand ring-offset-2;
-  ring-offset-color: #FEF2F2;
+  @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
 }
 
-/* Skip Link */
 .skip-link {
   @apply sr-only focus:not-sr-only;
   @apply absolute top-4 left-4 z-50;
-  @apply px-4 py-2 bg-brand text-white rounded-lg;
+  @apply px-4 py-2 bg-foreground text-background rounded-md text-sm font-medium;
 }
 
-/* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -419,10 +291,6 @@
     padding-top: 2rem;
     padding-bottom: 2rem;
   }
-
-  .text-responsive {
-    font-size: clamp(1.5rem, 4vw, 3rem);
-  }
 }
 
 /* ============================================
@@ -430,234 +298,15 @@
    ============================================ */
 
 .dark .card-brand {
-  @apply bg-gray-800 border-gray-700;
+  @apply bg-card border-border;
 }
 
 .dark .input-brand {
-  @apply bg-gray-800 border-gray-700 text-white;
+  @apply bg-card border-border text-foreground;
 }
 
 .dark .input-brand:focus {
-  @apply border-brand;
-}
-
-.dark .text-gradient-brand {
-  background: linear-gradient(135deg, #F87171 0%, #FCA5A5 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* ============================================
-   LEGACY SYSTEM CLASSES (Backward Compatibility)
-   ============================================ */
-
-/* These classes support existing pages during migration */
-
-/* Old Vitality Theme Classes */
-.text-gradient-vitality {
-  background: linear-gradient(135deg, #22c55e 0%, #14b8a6 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.btn-vitality {
-  @apply inline-flex items-center justify-center gap-3;
-  @apply px-8 py-4 rounded-full font-semibold text-white;
-  background: linear-gradient(135deg, #22c55e 0%, #14b8a6 100%);
-  box-shadow: 0 10px 40px rgba(34, 197, 94, 0.3);
-  transition: all 0.3s ease;
-}
-
-.btn-vitality:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 15px 50px rgba(34, 197, 94, 0.4);
-}
-
-.wellness-card {
-  @apply bg-white rounded-3xl border-2;
-  border-color: rgba(34, 197, 94, 0.1);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 1.5rem;
-}
-
-.wellness-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(34, 197, 94, 0.15);
-  border-color: rgba(34, 197, 94, 0.3);
-}
-
-.wellness-input {
-  @apply w-full px-5 py-4 rounded-2xl border-2 bg-white;
-  border-color: rgba(34, 197, 94, 0.2);
-  transition: all 0.3s ease;
-}
-
-.wellness-input:focus {
-  @apply focus:outline-none;
-  border-color: #22c55e;
-  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
-}
-
-.wellness-skeleton {
-  @apply bg-gradient-to-r from-green-50 via-green-100 to-green-50;
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
-}
-
-.wellness-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(34, 197, 94, 0.3) transparent;
-}
-
-.wellness-scrollbar::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.wellness-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.wellness-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(34, 197, 94, 0.3);
-  border-radius: 4px;
-}
-
-.wellness-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(34, 197, 94, 0.5);
-}
-
-/* Streak Flame Animation */
-@keyframes flame {
-  0%, 100% {
-    transform: scale(1) rotate(-2deg);
-    opacity: 1;
-  }
-  25%, 75% {
-    transform: scale(1.05) rotate(0deg);
-    opacity: 0.9;
-  }
-  50% {
-    transform: scale(1.02) rotate(2deg);
-    opacity: 1;
-  }
-}
-
-.streak-flame {
-  animation: flame 1.5s ease-in-out infinite;
-}
-
-/* Stat Cards */
-.stat-card-green {
-  @apply bg-white rounded-3xl p-6;
-  border-top: 4px solid #22c55e;
-}
-
-.stat-card-blue {
-  @apply bg-white rounded-3xl p-6;
-  border-top: 4px solid #3b82f6;
-}
-
-.stat-card-orange {
-  @apply bg-white rounded-3xl p-6;
-  border-top: 4px solid #f97316;
-}
-
-.stat-card-purple {
-  @apply bg-white rounded-3xl p-6;
-  border-top: 4px solid #a855f7;
-}
-
-/* Macro Bars */
-.macro-bar {
-  height: 8px;
-  border-radius: 999px;
-  overflow: hidden;
-  background: #f1f5f9;
-}
-
-.macro-protein {
-  background: linear-gradient(90deg, #22c55e, #16a34a);
-}
-
-.macro-carbs {
-  background: linear-gradient(90deg, #14b8a6, #0d9488);
-}
-
-.macro-fat {
-  background: linear-gradient(90deg, #f97316, #ea580c);
-}
-
-/* Meal Badges */
-.meal-breakfast {
-  @apply bg-amber-100 text-amber-700;
-}
-
-.meal-lunch {
-  @apply bg-green-100 text-green-700;
-}
-
-.meal-dinner {
-  @apply bg-purple-100 text-purple-700;
-}
-
-.meal-snack {
-  @apply bg-blue-100 text-blue-700;
-}
-
-/* Food Cards */
-.food-card {
-  @apply bg-white rounded-2xl p-4 border-2;
-  border-color: rgba(34, 197, 94, 0.05);
-  transition: all 0.3s ease;
-}
-
-.food-card:hover {
-  border-color: rgba(34, 197, 94, 0.2);
-  box-shadow: 0 8px 30px rgba(34, 197, 94, 0.12);
-  transform: scale(1.02);
-}
-
-/* Chart Cards */
-.chart-card {
-  @apply bg-white rounded-3xl p-6 border-2;
-  border-color: rgba(34, 197, 94, 0.05);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-}
-
-/* Quick Actions */
-.quick-action {
-  @apply flex flex-col items-center justify-center p-6 rounded-3xl bg-white border-2;
-  border-color: rgba(34, 197, 94, 0.1);
-  transition: all 0.3s ease;
-}
-
-.quick-action:hover {
-  border-color: rgba(34, 197, 94, 0.3);
-  box-shadow: 0 10px 30px rgba(34, 197, 94, 0.15);
-  transform: translateY(-4px);
-}
-
-/* Weekly Progress */
-.weekly-bar {
-  @apply h-2 bg-green-100 rounded-full overflow-hidden;
-}
-
-.weekly-fill {
-  @apply h-full bg-gradient-to-r from-green-500 to-green-400 rounded-full;
-  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Progress Ring */
-.progress-ring {
-  transform: rotate(-90deg);
-}
-
-.progress-ring-circle {
-  transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  @apply border-primary;
 }
 
 /* ============================================

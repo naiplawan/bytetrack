@@ -1,6 +1,6 @@
 // Smart Insights Engine - AI-powered recommendations and analysis
 
-import { getMealsByDate, getTotalCaloriesForDay, getMacrosForDay } from './meal-service';
+import { getMealsByDate, getMacrosForDay } from './meal-service';
 import { getDailyStats, getCurrentStreak, getWeightEntries } from './analytics-service';
 import { searchLocalFoods, type FoodItem } from './food-api';
 
@@ -132,10 +132,15 @@ export async function identifyNutritionalGoals(
   return gaps;
 }
 
+export interface UserDataInput {
+  macroTargets?: { protein?: number; carbs?: number; fat?: number };
+  waterTarget?: number;
+}
+
 // Generate personalized recommendations
 export async function generateRecommendations(
   calorieGoal: number,
-  userData?: any
+  userData?: UserDataInput
 ): Promise<Insight[]> {
   const insights: Insight[] = [];
   const dailyStats = await getDailyStats(1, calorieGoal);
